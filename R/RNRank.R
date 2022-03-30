@@ -1,4 +1,3 @@
-#' @encoding UTF-8
 #' Rank by gene importance
 #'
 #' @description Υπολογισμός σημαντικότητας γονιδίων ρυθμιστικού δικτύου με χρήση αλγορίθμου
@@ -23,6 +22,8 @@
 #'
 #' @return Ονοματισμένος πίνακας ποσοστών (0-1) 1 στήλης.
 #' @export
+#'
+#' @examples
 RNRank = function(srcm, damping=1.0, max_iterations=100, threshold=0,
                   self=F, letZeros=F, divider=100.0, sorted=T,
                   verbose=F, throwOnError=T)

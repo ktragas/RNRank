@@ -8,14 +8,14 @@ sortable.html.table <- function(df,
   {
     dir.create(output.directory, recursive = TRUE)
   }
-  
+
   # Print an HTML file from our template.
-  brew(file = system.file('template.brew', package = 'SortableHTMLTables'),
+  brew::brew(file = system.file('template.brew::brew', package = 'SortableHTMLTables'),
        output = file.path(output.directory, output.file))
-  
+
   # Copy Javascript, CSS and GIF assets.
   assets <- dir(system.file('assets', package = 'SortableHTMLTables'))
-  
+
   for (asset in assets)
   {
     file.copy(file.path(system.file('assets', package = 'SortableHTMLTables'), asset),
