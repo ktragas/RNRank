@@ -31,7 +31,7 @@ RNEAv3<-function(filename,identifier="GeneName",species,
 
   if(identifier=="Refseq"){
 		Refseq=utils::read.table("ReferenceFiles/Refseq2Gene.txt",row.names=2,sep="\t");
-	}
+  }
 	TF_ref=paste("ReferenceFiles/",species,"_TF_plus_oreganno_trrust.tsv",sep="");
 	miRNA_ref=paste("ReferenceFiles/",species,"_miRNAs.tsv",sep="");
 	kegg_ref=paste("ReferenceFiles/",species,"_kegg.tsv",sep="");
@@ -251,7 +251,7 @@ RNEAv3<-function(filename,identifier="GeneName",species,
         dedown_len = length(dedown)
         if (needRegulatory) {
           # Parent - Child & Child - GrandChildren
-          # Αν το ρυθμιζόμενο γονίδιο είναι DE, θα έχει ήδη προστεθεί
+          # Αν το ρυθμιζόμενο γονίδιο είναι DE, ίσως έχει ήδη προστεθεί
           # στο προηγούμενο στάδιο, αλλά είναι πιο εύκολο να αφαιρεθεί
           # η διπλή εγγραφή με unique() στο τέλος, από το να γίνονται
           # έλεγχοι εδώ
@@ -281,7 +281,9 @@ RNEAv3<-function(filename,identifier="GeneName",species,
 	  de=intersect(regulated_genes,DE_genes);
 	  if(needRegulatory && length(de)>0)
 	        Network=rbind(Network,cbind(z,de));
-
+    # Πάει μόνο σε ένα επίπεδο, γιατί αν κάποιο από τα διαφορικά εκφρασμένα
+	  # ρυθμιζόμενα γονίδια ήταν ρυθμιστής, θα είχαμε ήδη ασχοληθεί μαζί του
+	  # στο προηγούμενο στάδιο
 	  miRNA_counts[z,3]=miRNA_counts[z,3]+length(de);
 	  miRNA_counts[z,4]=miRNA_counts[z,4]+length(deup);
 	  miRNA_counts[z,5]=miRNA_counts[z,5]+length(dedown);
