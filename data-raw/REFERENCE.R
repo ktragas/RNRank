@@ -1,0 +1,37 @@
+## code to prepare `REFERENCE` dataset goes here
+
+for (species in c("Human","Mouse")) {
+  TF_ref=paste("ReferenceFiles/",species,"_TF_plus_oreganno_trrust.tsv",sep="");
+  miRNA_ref=paste("ReferenceFiles/",species,"_miRNAs.tsv",sep="");
+  kegg_ref=paste("ReferenceFiles/",species,"_kegg.tsv",sep="");
+  keggcat_ref=paste("ReferenceFiles/",species,"_keggcat.tsv",sep="");
+  GOs_ref=paste("ReferenceFiles/",species,"_GOs.tsv",sep="");
+
+  TF=utils::read.table(TF_ref,sep="\t",fill=T);
+  rownames(TF)=TF[,2];
+  miRNA=utils::read.table(miRNA_ref,sep="\t",fill=T);
+  rownames(miRNA)=miRNA[,2];
+  kegg=utils::read.table(kegg_ref,sep="\t",fill=T);
+  rownames(kegg)=kegg[,2];
+  keggcat=utils::read.table(keggcat_ref,sep="\t",fill=T);
+  rownames(keggcat)=keggcat[,2];
+  gos=utils::read.table(GOs_ref,sep="\t",fill=T);
+  rownames(gos)=gos[,2];
+  if (species=="Human") {
+    TF_human=TF
+    miRNA_human=miRNA
+    kegg_human=kegg
+    keggcat_human=keggcat
+    gos_human=gos
+    usethis::use_data(TF_human, miRNA_human,kegg_human,keggcat_human,gos_human,
+                      internal=T, overwrite = T, compress = "xz")
+  } else {  # species=="Mouse"
+    TF_mouse=TF
+    miRNA_mouse=miRNA
+    kegg_mouse=kegg
+    keggcat_mouse=keggcat
+    gos_mouse=gos
+    usethis::use_data(TF_mouse, miRNA_mouse,kegg_mouse,keggcat_mouse,gos_mouse,
+                      internal=T, overwrite = T, compress = "xz")
+  }
+} # for (species...

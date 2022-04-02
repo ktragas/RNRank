@@ -1,14 +1,25 @@
-#' RNEA version 3
+#' @title
+#' Regulatory Network Enrichment Analysis (v3)
 #'
-#' @param filename
-#' @param identifier
-#' @param species
-#' @param FC_threshold
-#' @param PV_threshold
-#' @param network
-#' @param output_dir
-#' @param output
-#' @param type_of_output
+#' @description
+#' Infers active regulatory networks from gene expression data using a combination
+#' of prior knowledge and enrichment analysis
+#'
+#' @details
+#' Transcription factors (TF) control a multitude of constitutive, cell-specific, developmental, proliferative or homeostatic processes in the cells of all known organisms. Due to their central role in gene regulation a considerable number of human diseases have been associated with TF function, including metabolic, autoimmune disorders and cancer. Despite the progress over the last years, towards the identification of TF gene targets, either with experimental or in silico approaches, we are still far from accurately reconstructing the hierarchy of transcriptional regulators from genome-wide data. In this work we are trying to overcome the existing limitations for the inference and study of regulatory networks of TF-interactions and their subsequent use in enriching our understanding of key biological processes. Furthermore we are combining our approach with state of the art functional enrichment analyses in order to create a tool, called Regulatory Network Enrichment Analysis (RNEA) that will prioritize transcriptional and functional characteristics of a genome-wide expression experiment.
+#'
+#' Given a differential expression file RNEA extracts lists of prioritized TFs, miRNAs, KEGG pathways and categories and GO terms. Most importantly a regulatory subnetwork is extracted showing how the activated regulators interact with their target genes and between each other. In this way, given a genome-wide expression experiment, RNEA prioritizes important regulatory and functional components. It also succeeds to reconstruct meaningful subnetworks of gene regulation, offering further ways of analyzing the data based on network theory. A detailed guide describing RNEA's use can be found here https://sites.google.com/a/fleming.gr/rnea/manual. Additionally RNEA can extract a global regularory/functional network with the "activated" regulators, their target genes and functional categories whose members are overrepresented among differentially expressed genes. This network, although sometimes huge, gives a complete view in both functional and regulatory components affected at the system studied.
+#'
+#' @param filename Differential expression file (Cuffdiff, 3-column, 1-column)
+#' @param identifier default "GeneName" or (not working) "RefSeq"
+#' @param species Organism: "Human" or "Mouse"
+#' @param FC_threshold log2FC threshold
+#' @param PV_threshold p-value threshold
+#' @param network Needed output: "global" or (default) "regulatory" or "functional"
+#' @param output_dir Directory to save output to
+#' @param output Prefix for output files
+#' @param type_of_output Type of output: (default) "csv" or "html"
+#' @param reference_dir Directory containing reference files for unsupported species
 #'
 #' @return
 #' @export
@@ -16,9 +27,13 @@
 #' @examples
 RNEAv3<-function(filename,identifier="GeneName",species,
                  FC_threshold=1,PV_threshold=0.05,network="regulatory",
-                 output_dir=".",output="Output",type_of_output="csv"){# Κώστας - Ο έλεγχος των παραμέτρων να γίνεται άμεσα
+                 output_dir=".",output="Output",type_of_output="csv",
+                 reference_dir="ReferenceFiles"){
+  # Κώστας - Ο έλεγχος των παραμέτρων να γίνεται άμεσα
   if ((identifier %in% c("GeneName","Refseq"))==FALSE)
     warning("Please select a supported gene identifier (\"GeneName\" or \"Refseq\")");
+  if ((species %in% c("Mouse","Human"))==FALSE)
+    warning("\"Mouse\" and \"Human\" are the only species supported as of now");
   if ((type_of_output %in% c("html","csv"))==FALSE)
     warning("Please select type of output to be either \"html\" or \"csv\"")
   if ((network %in% c("global","functional","regulatory"))==FALSE)
@@ -32,22 +47,41 @@ RNEAv3<-function(filename,identifier="GeneName",species,
   if(identifier=="Refseq"){
 		Refseq=utils::read.table("ReferenceFiles/Refseq2Gene.txt",row.names=2,sep="\t");
   }
-	TF_ref=paste("ReferenceFiles/",species,"_TF_plus_oreganno_trrust.tsv",sep="");
-	miRNA_ref=paste("ReferenceFiles/",species,"_miRNAs.tsv",sep="");
-	kegg_ref=paste("ReferenceFiles/",species,"_kegg.tsv",sep="");
-	keggcat_ref=paste("ReferenceFiles/",species,"_keggcat.tsv",sep="");
-	GOs_ref=paste("ReferenceFiles/",species,"_GOs.tsv",sep="");
+  if (species %in% c("Human","Mouse")) {
+    # Για άνθρωπο και ποντίκι τα δεδομένα περιέχονται στο πακέτο
+    if (species=="Human") {
+      data(TF_human,miRNA_human,kegg_human,keggcat_human,gos_human)
+      TF=TF_human
+      miRNA=miRNA_human
+      kegg=kegg_human
+      keggcat=keggcat_human
+      gos=gos=gos_human
+    } else {  # species=="Mouse"
+      data(TF_mouse,miRNA_mouse,kegg_mouse,keggcat_mouse,gos_mouse)
+      TF=TF_mouse
+      miRNA=miRNA_mouse
+      kegg=kegg_mouse
+      keggcat=keggcat_mouse
+      gos=gos_mouse
+    }
+  } else { # Not human or mouse
+   	TF_ref=file.path(reference_dir,paste(species,"_TF_plus_oreganno_trrust.tsv",sep=""));
+ 	  miRNA_ref=file.path(reference_dir,paste(species,"_miRNAs.tsv",sep=""));
+ 	  kegg_ref=file.path(reference_dir,paste(species,"_kegg.tsv",sep=""));
+ 	  keggcat_ref=file.path(reference_dir,paste(species,"_keggcat.tsv",sep=""));
+   	GOs_ref=file.path(reference_dir,paste(species,"_GOs.tsv",sep=""));
 
-	TF=utils::read.table(TF_ref,sep="\t",fill=T);
-	rownames(TF)=TF[,2];
-	miRNA=utils::read.table(miRNA_ref,sep="\t",fill=T);
-	rownames(miRNA)=miRNA[,2];
-	kegg=utils::read.table(kegg_ref,sep="\t",fill=T);
-	rownames(kegg)=kegg[,2];
-	keggcat=utils::read.table(keggcat_ref,sep="\t",fill=T);
-	rownames(keggcat)=keggcat[,2];
- 	gos=utils::read.table(GOs_ref,sep="\t",fill=T);
- 	rownames(gos)=gos[,2];
+   	TF=utils::read.table(TF_ref,sep="\t",fill=T);
+  	rownames(TF)=TF[,2];
+  	miRNA=utils::read.table(miRNA_ref,sep="\t",fill=T);
+  	rownames(miRNA)=miRNA[,2];
+  	kegg=utils::read.table(kegg_ref,sep="\t",fill=T);
+  	rownames(kegg)=kegg[,2];
+  	keggcat=utils::read.table(keggcat_ref,sep="\t",fill=T);
+  	rownames(keggcat)=keggcat[,2];
+   	gos=utils::read.table(GOs_ref,sep="\t",fill=T);
+   	rownames(gos)=gos[,2];
+  }
 
 	Input=utils::read.table(filename,sep="\t",header=T);
 	if(ncol(Input)==1){
