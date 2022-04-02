@@ -2,7 +2,7 @@
 % Please edit documentation in R/RNEA_v3.R
 \name{RNEAv3}
 \alias{RNEAv3}
-\title{RNEA version 3}
+\title{Regulatory Network Enrichment Analysis (v3)}
 \usage{
 RNEAv3(
   filename,
@@ -17,11 +17,33 @@ RNEAv3(
 )
 }
 \arguments{
-\item{type_of_output}{}
+\item{filename}{Differential expression file (Cuffdiff, 3-column, 1-column)}
+
+\item{identifier}{default "GeneName" or (not working) "RefSeq"}
+
+\item{species}{Organism: "Human" or "Mouse"}
+
+\item{FC_threshold}{log2FC threshold}
+
+\item{PV_threshold}{p-value threshold}
+
+\item{network}{Needed output: "global" or (default) "regulatory" or "functional"}
+
+\item{output_dir}{Directory to save output to}
+
+\item{output}{Prefix for output files}
+
+\item{type_of_output}{Type of output: (default) "csv" or "html"}
 }
 \value{
 
 }
 \description{
-RNEA version 3
+Infers active regulatory networks from gene expression data using a combination
+of prior knowledge and enrichment analysis
+}
+\details{
+Transcription factors (TF) control a multitude of constitutive, cell-specific, developmental, proliferative or homeostatic processes in the cells of all known organisms. Due to their central role in gene regulation a considerable number of human diseases have been associated with TF function, including metabolic, autoimmune disorders and cancer. Despite the progress over the last years, towards the identification of TF gene targets, either with experimental or in silico approaches, we are still far from accurately reconstructing the hierarchy of transcriptional regulators from genome-wide data. In this work we are trying to overcome the existing limitations for the inference and study of regulatory networks of TF-interactions and their subsequent use in enriching our understanding of key biological processes. Furthermore we are combining our approach with state of the art functional enrichment analyses in order to create a tool, called Regulatory Network Enrichment Analysis (RNEA) that will prioritize transcriptional and functional characteristics of a genome-wide expression experiment.
+
+Given a differential expression file RNEA extracts lists of prioritized TFs, miRNAs, KEGG pathways and categories and GO terms. Most importantly a regulatory subnetwork is extracted showing how the activated regulators interact with their target genes and between each other. In this way, given a genome-wide expression experiment, RNEA prioritizes important regulatory and functional components. It also succeeds to reconstruct meaningful subnetworks of gene regulation, offering further ways of analyzing the data based on network theory. A detailed guide describing RNEA's use can be found here https://sites.google.com/a/fleming.gr/rnea/manual. Additionally RNEA can extract a global regularory/functional network with the "activated" regulators, their target genes and functional categories whose members are overrepresented among differentially expressed genes. This network, although sometimes huge, gives a complete view in both functional and regulatory components affected at the system studied.
 }

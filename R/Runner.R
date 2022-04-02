@@ -18,3 +18,5 @@ srcm=as.matrix(read.table(
  P=RNRank(srcm, max_iterations = 200, threshold=0.01, damping=0.85,
           self=T, letZeros = T, divider = 1000.0, verbose = T)
  print(head(P,10))
+
+
