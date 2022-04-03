@@ -18,36 +18,35 @@ RNRank(
 )
 }
 \arguments{
-\item{srcm}{Πίνακας ονομάτων γονιδίων 2 στηλών. Κάθε γραμμή περιέχει ένα ρυθμίζον
-κι ένα ρυθμιζόμενο γονίδιο.}
+\item{srcm}{Two-column gene matrix. Every row contains one regulating
+and one regulated gene.}
 
-\item{damping}{Συντελεστής απόσβεσης (0-1) που καθορίζει ποσοστό μη τυχαιότητας.}
+\item{damping}{Damping factor (0-1) defining percentage of non-randomness.}
 
-\item{max_iterations}{Ο μέγιστος αριθμός επαναλήψεων, αν δεν επιτευχθεί σύγκλιση νωρίτερα (minimum 10).}
+\item{max_iterations}{Maximum number of iterations, if not converging earlier (minimum 10).}
 
-\item{threshold}{Ευκλίδεια απόσταση μικρότερη ή ίση από αυτήν την τιμή μεταξύ των βημάτων,
-θα τερματίσει την επανάληψη.}
+\item{threshold}{Euclidean distance between iterations less than or equal to the threshold
+will terminate calculations}
 
-\item{self}{Καθορίζει αν επιτρέπονται οι εγγραφές αυτορρύθμισης.}
+\item{self}{Self regulations permitted (T) or not (F).}
 
-\item{letZeros}{Καθορίζει αν επιτρέπουμε τυχαίες μεταβάσεις από τα ρυθμίζοντα γονίδια
-προς άλλα που δεν καθορίζονται από τον πίνακά μας.}
+\item{letZeros}{FALSE to allow random regulations from regulating genes
+to those not normally regulated.}
 
-\item{divider}{Καθορίζει διαιρέτη του ποσοστού που υπολογίζεται για τις μεταβάσεις
-από τα μη ρυθμίζοντα γονίδια, ώστε το αποτέλεσμα της διαίρεσης να χρησιμοποιηθεί
-για τις τυχαίες/άγνωστες μεταβάσεις από τα ρυθμίζοντα (minimum 10).}
+\item{divider}{Divides the percentage used for dangling genes,
+to use it for random regulations from regulating genes (minimum 10).}
 
-\item{sorted}{Καθορίζει αν τα αποτελέσματα θα επιστραφούν ταξινομημένα κατά ποσοστό.}
+\item{sorted}{Results sorted by descending percentage (T) or unsorted (F).}
 
-\item{verbose}{Εμφανίζει κάποια μηνύματα κατά τη διαδικασία.}
+\item{verbose}{Shows some information during process.}
 
-\item{throwOnError}{Αν είναι FALSE, σε περίπτωση σοβαρού λάθους επιστρέφει NULL.
-Αλλιώς καλείται η stop().}
+\item{throwOnError}{If FALSE, in case of stopping error, returns NULL.
+Otherwise stop() is called.}
 }
 \value{
-Ονοματισμένος πίνακας ποσοστών (0-1) 1 στήλης.
+Named 1-column matrix of percentages (0-1).
 }
 \description{
-Υπολογισμός σημαντικότητας γονιδίων ρυθμιστικού δικτύου με χρήση αλγορίθμου
-παρόμοιου με τον PageRank της Google.
+Infers importance of Regulatory Network nodes (genes),
+by using a Google's PageRank-like algorithm.
 }

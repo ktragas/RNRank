@@ -1,6 +1,6 @@
 Package: RNRank
 Title: Gene Ranking In Inferred Active Regulatory Network
-Version: 0.1.0.9000
+Version: 0.1.1.9000
 Authors@R: 
     person("Konstantinos", "Tragkas", , "std507586@ac.eap.gr", role = c("aut", "cre"),
            comment = c(ORCID = "YOUR-ORCID-ID"))
@@ -16,6 +16,7 @@ Suggests:
 Config/testthat/edition: 3
 Imports: 
     brew,
+    rprojroot,
     stats,
     utils
 Depends: 

@@ -21,7 +21,7 @@
 #' @param type_of_output Type of output: (default) "csv" or "html"
 #' @param reference_dir Directory containing reference files for unsupported species
 #'
-#' @return
+#' @return "Analysis completed!"
 #' @export
 #'
 #' @examples
@@ -50,14 +50,14 @@ RNEAv3<-function(filename,identifier="GeneName",species,
   if (species %in% c("Human","Mouse")) {
     # Για άνθρωπο και ποντίκι τα δεδομένα περιέχονται στο πακέτο
     if (species=="Human") {
-      data(TF_human,miRNA_human,kegg_human,keggcat_human,gos_human)
+#      utils::data(TF_human,miRNA_human,kegg_human,keggcat_human,gos_human)
       TF=TF_human
       miRNA=miRNA_human
       kegg=kegg_human
       keggcat=keggcat_human
-      gos=gos=gos_human
+      gos=gos_human
     } else {  # species=="Mouse"
-      data(TF_mouse,miRNA_mouse,kegg_mouse,keggcat_mouse,gos_mouse)
+#      utils::data(TF_mouse,miRNA_mouse,kegg_mouse,keggcat_mouse,gos_mouse)
       TF=TF_mouse
       miRNA=miRNA_mouse
       kegg=kegg_mouse

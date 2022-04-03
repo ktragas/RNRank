@@ -39,7 +39,7 @@ RNEAv3(
 \item{reference_dir}{Directory containing reference files for unsupported species}
 }
 \value{
-
+"Analysis completed!"
 }
 \description{
 Infers active regulatory networks from gene expression data using a combination
