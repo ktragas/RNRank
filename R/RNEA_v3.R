@@ -8,7 +8,13 @@
 #' @details
 #' Transcription factors (TF) control a multitude of constitutive, cell-specific, developmental, proliferative or homeostatic processes in the cells of all known organisms. Due to their central role in gene regulation a considerable number of human diseases have been associated with TF function, including metabolic, autoimmune disorders and cancer. Despite the progress over the last years, towards the identification of TF gene targets, either with experimental or in silico approaches, we are still far from accurately reconstructing the hierarchy of transcriptional regulators from genome-wide data. In this work we are trying to overcome the existing limitations for the inference and study of regulatory networks of TF-interactions and their subsequent use in enriching our understanding of key biological processes. Furthermore we are combining our approach with state of the art functional enrichment analyses in order to create a tool, called Regulatory Network Enrichment Analysis (RNEA) that will prioritize transcriptional and functional characteristics of a genome-wide expression experiment.
 #'
-#' Given a differential expression file RNEA extracts lists of prioritized TFs, miRNAs, KEGG pathways and categories and GO terms. Most importantly a regulatory subnetwork is extracted showing how the activated regulators interact with their target genes and between each other. In this way, given a genome-wide expression experiment, RNEA prioritizes important regulatory and functional components. It also succeeds to reconstruct meaningful subnetworks of gene regulation, offering further ways of analyzing the data based on network theory. A detailed guide describing RNEA's use can be found here https://sites.google.com/a/fleming.gr/rnea/manual. Additionally RNEA can extract a global regularory/functional network with the "activated" regulators, their target genes and functional categories whose members are overrepresented among differentially expressed genes. This network, although sometimes huge, gives a complete view in both functional and regulatory components affected at the system studied.
+#' Given a differential expression file RNEA extracts lists of prioritized TFs, miRNAs, KEGG pathways and categories and GO terms.
+#' Most importantly a regulatory subnetwork is extracted showing how the activated regulators interact with their target genes and between each other.
+#' In this way, given a genome-wide expression experiment, RNEA prioritizes important regulatory and functional components.
+#' It also succeeds to reconstruct meaningful subnetworks of gene regulation, offering further ways of analyzing the data based on network theory.
+#' A detailed guide describing RNEA's use can be found [here](https://sites.google.com/a/fleming.gr/rnea/manual).
+#'  Additionally RNEA can extract a global regularory/functional network with the "activated" regulators, their target genes and functional categories whose members are overrepresented among differentially expressed genes.
+#'  This network, although sometimes huge, gives a complete view in both functional and regulatory components affected at the system studied.
 #'
 #' @param filename Differential expression file (Cuffdiff, 3-column, 1-column)
 #' @param identifier default "GeneName" or (not working) "RefSeq"
@@ -21,7 +27,7 @@
 #' @param type_of_output Type of output: (default) "csv" or "html"
 #' @param reference_dir Directory containing reference files for unsupported species
 #' @param rank Call RNRank() on the resulting network and save an extra file with ranks
-#'
+#' @param ... Arguments to be passed to [RNRank()]
 #' @return "Analysis completed!"
 #' @export
 #'
@@ -625,6 +631,7 @@ RNEAv3<-function(filename,identifier="GeneName",species,
 	} else {
 		Network_final=Network;
 	}
+	Network_final=unique(Network_final)
 
 	# Αν δεν υπάρχει το directory εξόδου, το δημιουργώ
 	if (dir.exists(output_dir)==FALSE)
@@ -635,9 +642,9 @@ RNEAv3<-function(filename,identifier="GeneName",species,
 
 	if (rank) {
 	  P=RNRank(Network_final,...)
-	  utils::write.csv(P,file=paste0(output,"_Ranks.csv"))
+	  utils::write.csv(P,file=paste0(output,"_Ranks.csv"),quote = F,row.names = T)
 	}
-	utils::write.csv(unique(Network_final),file=paste0(output,"_Network.csv"),quote=F,row.names=F);
+	utils::write.csv(Network_final,file=paste0(output,"_Network.csv"),quote=F,row.names=F);
 
 	tempnames=c("Regulator",colnames(ResultsTF));
 	ResultsTF=cbind(rownames(ResultsTF),as.data.frame(ResultsTF));
@@ -667,11 +674,11 @@ RNEAv3<-function(filename,identifier="GeneName",species,
 		sortable.html.table(as.data.frame(Resultskeggcat),paste(output,"KEGG_category_Enrichment.html"),page.title=paste(output,"KEGG_category_Enrichment"));
 		sortable.html.table(as.data.frame(Resultsgo),paste(output,"GO_Enrichment.html"),page.title=paste(output,"GO_Enrichment"));
 	}else if(type_of_output=="csv"){
-		utils::write.csv(as.data.frame(ResultsTF),file=paste(output,"_TF_Enrichment.csv", sep=""),row.names=F);
-		utils::write.csv(as.data.frame(ResultsmiRNA),file=paste(output,"_miRNA_Enrichment.csv", sep=""),row.names=F);
-		utils::write.csv(as.data.frame(Resultskegg),file=paste(output,"_KEGG_Enrichment.csv", sep=""),row.names=F);
-		utils::write.csv(as.data.frame(Resultskeggcat),file=paste(output,"_KEGG_category_Enrichment.csv", sep=""),row.names=F);
-		utils::write.csv(as.data.frame(Resultsgo),file=paste(output,"_GO_Enrichment.csv", sep=""),row.names=F);
+		utils::write.csv(as.data.frame(ResultsTF),file=paste0(output,"_TF_Enrichment.csv"),row.names=F);
+		utils::write.csv(as.data.frame(ResultsmiRNA),file=paste0(output,"_miRNA_Enrichment.csv"),row.names=F);
+		utils::write.csv(as.data.frame(Resultskegg),file=paste0(output,"_KEGG_Enrichment.csv"),row.names=F);
+		utils::write.csv(as.data.frame(Resultskeggcat),file=paste0(output,"_KEGG_category_Enrichment.csv"),row.names=F);
+		utils::write.csv(as.data.frame(Resultsgo),file=paste0(output,"_GO_Enrichment.csv"),row.names=F);
 	}
 	# Κώστας - Commented out
 	# else {
