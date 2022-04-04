@@ -1,26 +1,25 @@
 #' Rank by gene importance
 #'
-#' @description Υπολογισμός σημαντικότητας γονιδίων ρυθμιστικού δικτύου με χρήση αλγορίθμου
-#' παρόμοιου με τον PageRank της Google.
+#' @description Infers importance of Regulatory Network nodes (genes),
+#' by using a Google's PageRank-like algorithm.
 #'
-#' @param srcm Πίνακας ονομάτων γονιδίων 2 στηλών. Κάθε γραμμή περιέχει ένα ρυθμίζον
-#' κι ένα ρυθμιζόμενο γονίδιο.
-#' @param max_iterations Ο μέγιστος αριθμός επαναλήψεων, αν δεν επιτευχθεί σύγκλιση νωρίτερα (minimum 10).
-#' @param threshold Ευκλίδεια απόσταση μικρότερη ή ίση από αυτήν την τιμή μεταξύ των βημάτων,
-#' θα τερματίσει την επανάληψη.
-#' @param damping Συντελεστής απόσβεσης (0-1) που καθορίζει ποσοστό μη τυχαιότητας.
-#' @param self Καθορίζει αν επιτρέπονται οι εγγραφές αυτορρύθμισης.
-#' @param letZeros Καθορίζει αν επιτρέπουμε τυχαίες μεταβάσεις από τα ρυθμίζοντα γονίδια
-#' προς άλλα που δεν καθορίζονται από τον πίνακά μας.
-#' @param divider Καθορίζει διαιρέτη του ποσοστού που υπολογίζεται για τις μεταβάσεις
-#' από τα μη ρυθμίζοντα γονίδια, ώστε το αποτέλεσμα της διαίρεσης να χρησιμοποιηθεί
-#' για τις τυχαίες/άγνωστες μεταβάσεις από τα ρυθμίζοντα (minimum 10).
-#' @param sorted Καθορίζει αν τα αποτελέσματα θα επιστραφούν ταξινομημένα κατά ποσοστό.
-#' @param verbose Εμφανίζει κάποια μηνύματα κατά τη διαδικασία.
-#' @param throwOnError Αν είναι FALSE, σε περίπτωση σοβαρού λάθους επιστρέφει NULL.
-#' Αλλιώς καλείται η stop().
+#' @param srcm Two-column gene matrix. Every row contains one regulating
+#' and one regulated gene.
+#' @param max_iterations Maximum number of iterations, if not converging earlier (minimum 10).
+#' @param threshold Euclidean distance between iterations less than or equal to the threshold
+#' will terminate calculations
+#' @param damping Damping factor (0-1) defining percentage of non-randomness.
+#' @param self Self regulations permitted (T) or not (F).
+#' @param letZeros FALSE to allow random regulations from regulating genes
+#' to those not normally regulated.
+#' @param divider Divides the percentage used for dangling genes,
+#' to use it for random regulations from regulating genes (minimum 10).
+#' @param sorted Results sorted by descending percentage (T) or unsorted (F).
+#' @param verbose Shows some information during process.
+#' @param throwOnError If FALSE, in case of stopping error, returns NULL.
+#' Otherwise stop() is called.
 #'
-#' @return Ονοματισμένος πίνακας ποσοστών (0-1) 1 στήλης.
+#' @return Named 1-column matrix of percentages (0-1).
 #' @export
 #'
 #' @examples
@@ -131,6 +130,7 @@ RNRank = function(srcm, damping=1.0, max_iterations=100, threshold=0,
   # Αρχικοποίηση [1,0,0,....]
   I=matrix(data=0,nrow=len_g,ncol=1)
   rownames(I)=rownames(H)
+  colnames(I)=c("Rank")
   I[1,1]=1
 
   # Τεστ με πίνακα 8X8 για τον οποίο γνωρίζω τα τελικά αποτελέσματα

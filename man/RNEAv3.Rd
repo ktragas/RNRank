@@ -13,7 +13,10 @@ RNEAv3(
   network = "regulatory",
   output_dir = ".",
   output = "Output",
-  type_of_output = "csv"
+  type_of_output = "csv",
+  reference_dir = "ReferenceFiles",
+  rank = T,
+  ...
 )
 }
 \arguments{
@@ -34,9 +37,13 @@ RNEAv3(
 \item{output}{Prefix for output files}
 
 \item{type_of_output}{Type of output: (default) "csv" or "html"}
+
+\item{reference_dir}{Directory containing reference files for unsupported species}
+
+\item{rank}{Call RNRank() on the resulting network and save an extra file with ranks}
 }
 \value{
-
+"Analysis completed!"
 }
 \description{
 Infers active regulatory networks from gene expression data using a combination

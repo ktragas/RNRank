@@ -19,14 +19,18 @@
 #' @param output_dir Directory to save output to
 #' @param output Prefix for output files
 #' @param type_of_output Type of output: (default) "csv" or "html"
+#' @param reference_dir Directory containing reference files for unsupported species
+#' @param rank Call RNRank() on the resulting network and save an extra file with ranks
 #'
-#' @return
+#' @return "Analysis completed!"
 #' @export
 #'
 #' @examples
 RNEAv3<-function(filename,identifier="GeneName",species,
                  FC_threshold=1,PV_threshold=0.05,network="regulatory",
-                 output_dir=".",output="Output",type_of_output="csv"){
+                 output_dir=".",output="Output",type_of_output="csv",
+                 reference_dir="ReferenceFiles",rank=T, ...){
+
   # Κώστας - Ο έλεγχος των παραμέτρων να γίνεται άμεσα
   if ((identifier %in% c("GeneName","Refseq"))==FALSE)
     warning("Please select a supported gene identifier (\"GeneName\" or \"Refseq\")");
@@ -45,36 +49,41 @@ RNEAv3<-function(filename,identifier="GeneName",species,
   if(identifier=="Refseq"){
 		Refseq=utils::read.table("ReferenceFiles/Refseq2Gene.txt",row.names=2,sep="\t");
   }
-# 	TF_ref=paste("ReferenceFiles/",species,"_TF_plus_oreganno_trrust.tsv",sep="");
-# 	miRNA_ref=paste("ReferenceFiles/",species,"_miRNAs.tsv",sep="");
-# 	kegg_ref=paste("ReferenceFiles/",species,"_kegg.tsv",sep="");
-# 	keggcat_ref=paste("ReferenceFiles/",species,"_keggcat.tsv",sep="");
-# 	GOs_ref=paste("ReferenceFiles/",species,"_GOs.tsv",sep="");
-#
-# 	TF=utils::read.table(TF_ref,sep="\t",fill=T);
-# 	rownames(TF)=TF[,2];
-# 	miRNA=utils::read.table(miRNA_ref,sep="\t",fill=T);
-# 	rownames(miRNA)=miRNA[,2];
-# 	kegg=utils::read.table(kegg_ref,sep="\t",fill=T);
-# 	rownames(kegg)=kegg[,2];
-# 	keggcat=utils::read.table(keggcat_ref,sep="\t",fill=T);
-# 	rownames(keggcat)=keggcat[,2];
-#  	gos=utils::read.table(GOs_ref,sep="\t",fill=T);
-#  	rownames(gos)=gos[,2];
-  if (species=="Human") {
-    data(TF_human,miRNA_human,kegg_human,keggcat_human,gos_human)
-    TF=TF_human
-    miRNA=miRNA_human
-    kegg=kegg_human
-    keggcat=keggcat_human
-    gos=gos=gos_human
-  } else {  # species=="Mouse"
-    data(TF_mouse,miRNA_mouse,kegg_mouse,keggcat_mouse,gos_mouse)
-    TF=TF_mouse
-    miRNA=miRNA_mouse
-    kegg=kegg_mouse
-    keggcat=keggcat_mouse
-    gos=gos_mouse
+
+  if (species %in% c("Human","Mouse")) {
+    # Για άνθρωπο και ποντίκι τα δεδομένα περιέχονται στο πακέτο
+    if (species=="Human") {
+#      utils::data(TF_human,miRNA_human,kegg_human,keggcat_human,gos_human)
+      TF=TF_human
+      miRNA=miRNA_human
+      kegg=kegg_human
+      keggcat=keggcat_human
+      gos=gos_human
+    } else {  # species=="Mouse"
+#      utils::data(TF_mouse,miRNA_mouse,kegg_mouse,keggcat_mouse,gos_mouse)
+      TF=TF_mouse
+      miRNA=miRNA_mouse
+      kegg=kegg_mouse
+      keggcat=keggcat_mouse
+      gos=gos_mouse
+    }
+  } else { # Not human or mouse
+   	TF_ref=file.path(reference_dir,paste(species,"_TF_plus_oreganno_trrust.tsv",sep=""));
+ 	  miRNA_ref=file.path(reference_dir,paste(species,"_miRNAs.tsv",sep=""));
+ 	  kegg_ref=file.path(reference_dir,paste(species,"_kegg.tsv",sep=""));
+ 	  keggcat_ref=file.path(reference_dir,paste(species,"_keggcat.tsv",sep=""));
+   	GOs_ref=file.path(reference_dir,paste(species,"_GOs.tsv",sep=""));
+
+   	TF=utils::read.table(TF_ref,sep="\t",fill=T);
+  	rownames(TF)=TF[,2];
+  	miRNA=utils::read.table(miRNA_ref,sep="\t",fill=T);
+  	rownames(miRNA)=miRNA[,2];
+  	kegg=utils::read.table(kegg_ref,sep="\t",fill=T);
+  	rownames(kegg)=kegg[,2];
+  	keggcat=utils::read.table(keggcat_ref,sep="\t",fill=T);
+  	rownames(keggcat)=keggcat[,2];
+   	gos=utils::read.table(GOs_ref,sep="\t",fill=T);
+   	rownames(gos)=gos[,2];
   }
 
 	Input=utils::read.table(filename,sep="\t",header=T);
@@ -624,7 +633,11 @@ RNEAv3<-function(filename,identifier="GeneName",species,
 	if (dir.exists(output_dir)==TRUE)
 	  output=file.path(output_dir,output)
 
-	utils::write.csv(unique(Network_final),file=paste(output,"_Network.csv", sep=""),quote=F,row.names=F);
+	if (rank) {
+	  P=RNRank(Network_final,...)
+	  utils::write.csv(P,file=paste0(output,"_Ranks.csv"))
+	}
+	utils::write.csv(unique(Network_final),file=paste0(output,"_Network.csv"),quote=F,row.names=F);
 
 	tempnames=c("Regulator",colnames(ResultsTF));
 	ResultsTF=cbind(rownames(ResultsTF),as.data.frame(ResultsTF));

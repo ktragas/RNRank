@@ -1,11 +1,14 @@
 ## code to prepare `REFERENCE` dataset goes here
-
+TF_human=miRNA_human=kegg_human=keggcat_human=gos_human=
+TF_mouse=miRNA_mouse=kegg_mouse=keggcat_mouse=gos_mouse=NULL
+TF=miRNA=kegg=keggcat=gos=NULL
+RefPath=system.file("extdata","ReferenceFiles/",package="RNRank")
 for (species in c("Human","Mouse")) {
-  TF_ref=paste("ReferenceFiles/",species,"_TF_plus_oreganno_trrust.tsv",sep="");
-  miRNA_ref=paste("ReferenceFiles/",species,"_miRNAs.tsv",sep="");
-  kegg_ref=paste("ReferenceFiles/",species,"_kegg.tsv",sep="");
-  keggcat_ref=paste("ReferenceFiles/",species,"_keggcat.tsv",sep="");
-  GOs_ref=paste("ReferenceFiles/",species,"_GOs.tsv",sep="");
+  TF_ref=file.path(RefPath,paste0(species,"_TF_plus_oreganno_trrust.tsv"));
+  miRNA_ref=file.path(RefPath,paste0(species,"_miRNAs.tsv"));
+  kegg_ref=file.path(RefPath,paste0(species,"_kegg.tsv",sep=""));
+  keggcat_ref=file.path(RefPath,paste0(species,"_keggcat.tsv"));
+  GOs_ref=file.path(RefPath,paste0(species,"_GOs.tsv"));
 
   TF=utils::read.table(TF_ref,sep="\t",fill=T);
   rownames(TF)=TF[,2];
@@ -23,15 +26,14 @@ for (species in c("Human","Mouse")) {
     kegg_human=kegg
     keggcat_human=keggcat
     gos_human=gos
-    usethis::use_data(TF_human, miRNA_human,kegg_human,keggcat_human,gos_human,
-                      internal=T, overwrite = T, compress = "xz")
   } else {  # species=="Mouse"
     TF_mouse=TF
     miRNA_mouse=miRNA
     kegg_mouse=kegg
     keggcat_mouse=keggcat
     gos_mouse=gos
-    usethis::use_data(TF_mouse, miRNA_mouse,kegg_mouse,keggcat_mouse,gos_mouse,
-                      internal=T, overwrite = T, compress = "xz")
   }
 } # for (species...
+usethis::use_data(TF_human, miRNA_human,kegg_human,keggcat_human,gos_human,
+                  TF_mouse, miRNA_mouse,kegg_mouse,keggcat_mouse,gos_mouse,
+                  internal=T, overwrite = T, compress = "xz")
