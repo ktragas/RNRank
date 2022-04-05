@@ -286,7 +286,7 @@ RNEAv3<-function(filename,identifier="GeneName",species,
         gene = TF[z, tidx]
         if (length(intersect(gene, rownames(TF))) <= 0) next
 
-        # αν ρυθμίζει κι αυτό κάποια γονίδια
+        # αν ρυθμίζει κι αυτό κάποια γονίδια (είναι δηλαδή TF)
         inner_last_index=2 + TF[gene, 1]
         deup = intersect(as.matrix(TF[gene, 3:inner_last_index]), UP_genes)
         dedown = intersect(as.matrix(TF[gene, 3:inner_last_index]), DOWN_genes)
@@ -608,6 +608,9 @@ RNEAv3<-function(filename,identifier="GeneName",species,
 	Network_final=matrix(ncol=2,nrow=0);
 
 	if(needFunctional){
+	  # Για κάποιο λόγο από τον παλιό κώδικα η μεταβλητή Network είναι list,
+	  # οπότε πρέπει να τη διορθώσω
+	  Network=matrix(unlist(Network),ncol=2)
 		for(interaction in 1:nrow(Network)){
 			z1=intersect(Network[interaction,1],rownames(Resultskegg));
 			z2=intersect(Network[interaction,1],rownames(Resultskeggcat));
@@ -628,8 +631,9 @@ RNEAv3<-function(filename,identifier="GeneName",species,
 				Network_final=rbind(Network_final,Network[interaction,]);
 			}
 		}
-	} else {
-		Network_final=Network;
+	}
+	if (needRegulatory) {
+		Network_final=rbind(Network_final,Network);
 	}
 	Network_final=unique(Network_final)
 
