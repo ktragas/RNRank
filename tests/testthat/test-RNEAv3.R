@@ -9,7 +9,7 @@ test_that("RNEAv3 works", {
       OutputPath=file.path(rprojroot::find_root(rprojroot::has_dir("tests")),"Output")
       RNEAv3(
         filename=file,
-        species="Mouse",network="global",type_of_output="csv",
+        species="Mouse",network="regulatory",type_of_output="csv",
         output_dir=OutputPath,
         output="gene_exp_out"
         ,rank=T,max_iterations = 200, threshold=0.01, damping=0.85,

@@ -70,7 +70,7 @@ RNRank = function(srcm, damping=1.0, max_iterations=100, threshold=0,
   # s: Ρυθμίζοντα γονίδια (source)
   s=names(sort(table(m[,1]),decreasing = T))
 
-  for (i in 1:length(s)) {
+  for (i in seq_along(s)) {
     m1=rbind(m1,m[which(m[,1]==s[i]),])
   }
   m=m1
@@ -149,7 +149,7 @@ RNRank = function(srcm, damping=1.0, max_iterations=100, threshold=0,
   # I=I[1:8]
 
   # Power method
-  for (i in 1:max_iterations) {
+  for (i in seq_len(max_iterations)) {
     # if (i==60) {
     #   print("Break")
     # }

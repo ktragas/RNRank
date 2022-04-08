@@ -50,11 +50,11 @@ RNEAv3<-function(filename,identifier="GeneName",species,
   needFunctional=network %in% c("global","functional")
   needRegulatory=network %in% c("global","regulatory")
 
-  # Μετά από τον έλεγχο παραμέτρων, όλα τα warnings αγνοούνται
-  options(warn=-1);
+  # Μετά από τον έλεγχο παραμέτρων, όλα τα warnings αγνοούνται μέχρι το τέλος της συνάρτησης
+  withr::local_options(list(warn = -1))
 
   if(identifier=="Refseq"){
-		Refseq=utils::read.table("ReferenceFiles/Refseq2Gene.txt",row.names=2,sep="\t");
+		Refseq=read.table("ReferenceFiles/Refseq2Gene.txt",row.names=2,sep="\t");
   }
 
   if (species %in% c("Human","Mouse")) {
@@ -81,19 +81,19 @@ RNEAv3<-function(filename,identifier="GeneName",species,
  	  keggcat_ref=file.path(reference_dir,paste(species,"_keggcat.tsv",sep=""));
    	GOs_ref=file.path(reference_dir,paste(species,"_GOs.tsv",sep=""));
 
-   	TF=utils::read.table(TF_ref,sep="\t",fill=T);
+   	TF=read.table(TF_ref,sep="\t",fill=T);
   	rownames(TF)=TF[,2];
-  	miRNA=utils::read.table(miRNA_ref,sep="\t",fill=T);
+  	miRNA=read.table(miRNA_ref,sep="\t",fill=T);
   	rownames(miRNA)=miRNA[,2];
-  	kegg=utils::read.table(kegg_ref,sep="\t",fill=T);
+  	kegg=read.table(kegg_ref,sep="\t",fill=T);
   	rownames(kegg)=kegg[,2];
-  	keggcat=utils::read.table(keggcat_ref,sep="\t",fill=T);
+  	keggcat=read.table(keggcat_ref,sep="\t",fill=T);
   	rownames(keggcat)=keggcat[,2];
-   	gos=utils::read.table(GOs_ref,sep="\t",fill=T);
+   	gos=read.table(GOs_ref,sep="\t",fill=T);
    	rownames(gos)=gos[,2];
   }
 
-	Input=utils::read.table(filename,sep="\t",header=T);
+	Input=read.table(filename,sep="\t",header=T);
 	if(ncol(Input)==1){
 	  Total_number_of_genes=length(unique(Input[,1]));
 	}
@@ -134,7 +134,7 @@ RNEAv3<-function(filename,identifier="GeneName",species,
 	else if (ncolInput==3) { g_idx=1; fc_idx=2; pv_idx=3; }
 	else if (ncolInput==1) { g_idx=1; }
 
-	for (line in 1:nrow(Input)){ # Στον παλιό κώδικα έλεγε for(line in 2:nrow(Input)) - πρώην header???
+	for (line in seq_len(nrow(Input))){ # Στον παλιό κώδικα έλεγε for(line in 2:nrow(Input)) - πρώην header???
 	  if (Input[line,pv_idx]>PV_threshold) next;
 	  if (Input[line,fc_idx]>-FC_threshold && Input[line,fc_idx]<FC_threshold) next;
 
@@ -316,7 +316,7 @@ RNEAv3<-function(filename,identifier="GeneName",species,
     } # for (z...
 	} # for (direction...
 
-	for(mir in 1:nrow(miRNA)){
+	for(mir in seq_len(nrow(miRNA))){
 	  z=rownames(miRNA)[mir];
 	  last_index=2+miRNA[z,1];
 	  regulated_genes=as.matrix(miRNA[z,3:last_index])
@@ -616,7 +616,7 @@ RNEAv3<-function(filename,identifier="GeneName",species,
 	  # Για κάποιο λόγο από τον παλιό κώδικα η μεταβλητή Network είναι list,
 	  # οπότε πρέπει να τη διορθώσω
 	  Network=matrix(unlist(Network),ncol=2)
-		for(interaction in 1:nrow(Network)){
+		for(interaction in seq_len(nrow(Network))){
 			z1=intersect(Network[interaction,1],rownames(Resultskegg));
 			z2=intersect(Network[interaction,1],rownames(Resultskeggcat));
 			z3=intersect(Network[interaction,1],rownames(Resultsgo));
@@ -650,13 +650,13 @@ RNEAv3<-function(filename,identifier="GeneName",species,
 	  output=file.path(output_dir,output)
 
 	if (ffl) {
-	  utils::write.csv(outffl,file=paste0(output,"_FFLs.csv"),quote = F,row.names = F)
+	  write.csv(outffl,file=paste0(output,"_FFLs.csv"),quote = F,row.names = F)
 	}
 	if (rank) {
 	  P=RNRank(Network_final,...)
-	  utils::write.csv(P,file=paste0(output,"_Ranks.csv"),quote = F,row.names = T)
+	  write.csv(P,file=paste0(output,"_Ranks.csv"),quote = F,row.names = T)
 	}
-	utils::write.csv(Network_final,file=paste0(output,"_Network.csv"),quote=F,row.names=F);
+	write.csv(Network_final,file=paste0(output,"_Network.csv"),quote=F,row.names=F);
 
 	tempnames=c("Regulator",colnames(ResultsTF));
 	ResultsTF=cbind(rownames(ResultsTF),as.data.frame(ResultsTF));
@@ -686,17 +686,18 @@ RNEAv3<-function(filename,identifier="GeneName",species,
 		sortable.html.table(as.data.frame(Resultskeggcat),paste(output,"KEGG_category_Enrichment.html"),page.title=paste(output,"KEGG_category_Enrichment"));
 		sortable.html.table(as.data.frame(Resultsgo),paste(output,"GO_Enrichment.html"),page.title=paste(output,"GO_Enrichment"));
 	}else if(type_of_output=="csv"){
-		utils::write.csv(as.data.frame(ResultsTF),file=paste0(output,"_TF_Enrichment.csv"),row.names=F);
-		utils::write.csv(as.data.frame(ResultsmiRNA),file=paste0(output,"_miRNA_Enrichment.csv"),row.names=F);
-		utils::write.csv(as.data.frame(Resultskegg),file=paste0(output,"_KEGG_Enrichment.csv"),row.names=F);
-		utils::write.csv(as.data.frame(Resultskeggcat),file=paste0(output,"_KEGG_category_Enrichment.csv"),row.names=F);
-		utils::write.csv(as.data.frame(Resultsgo),file=paste0(output,"_GO_Enrichment.csv"),row.names=F);
+		write.csv(as.data.frame(ResultsTF),file=paste0(output,"_TF_Enrichment.csv"),row.names=F);
+		write.csv(as.data.frame(ResultsmiRNA),file=paste0(output,"_miRNA_Enrichment.csv"),row.names=F);
+		write.csv(as.data.frame(Resultskegg),file=paste0(output,"_KEGG_Enrichment.csv"),row.names=F);
+		write.csv(as.data.frame(Resultskeggcat),file=paste0(output,"_KEGG_category_Enrichment.csv"),row.names=F);
+		write.csv(as.data.frame(Resultsgo),file=paste0(output,"_GO_Enrichment.csv"),row.names=F);
 	}
 	# Κώστας - Commented out
 	# else {
 	# 	print("Please select type of output to be either \"html\" or \"csv\"");
 	# }
 
+	# Return
 	print("Analysis completed!");
 }
 

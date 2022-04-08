@@ -3,3 +3,5 @@
 export(RNEAv3)
 export(RNFfl)
 export(RNRank)
+importFrom(utils,read.table)
+importFrom(utils,write.csv)
