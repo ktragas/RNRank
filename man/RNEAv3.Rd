@@ -15,6 +15,7 @@ RNEAv3(
   output = "Output",
   type_of_output = "csv",
   reference_dir = "ReferenceFiles",
+  ffl = T,
   rank = T,
   ...
 )
@@ -39,6 +40,8 @@ RNEAv3(
 \item{type_of_output}{Type of output: (default) "csv" or "html"}
 
 \item{reference_dir}{Directory containing reference files for unsupported species}
+
+\item{ffl}{Locate and save Feed-Forward Loops}
 
 \item{rank}{Call RNRank() on the resulting network and save an extra file with ranks}
 

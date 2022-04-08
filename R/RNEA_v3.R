@@ -26,6 +26,7 @@
 #' @param output Prefix for output files
 #' @param type_of_output Type of output: (default) "csv" or "html"
 #' @param reference_dir Directory containing reference files for unsupported species
+#' @param ffl Locate and save Feed-Forward Loops
 #' @param rank Call RNRank() on the resulting network and save an extra file with ranks
 #' @param ... Arguments to be passed to [RNRank()]
 #' @return "Analysis completed!"
@@ -35,7 +36,7 @@
 RNEAv3<-function(filename,identifier="GeneName",species,
                  FC_threshold=1,PV_threshold=0.05,network="regulatory",
                  output_dir=".",output="Output",type_of_output="csv",
-                 reference_dir="ReferenceFiles",rank=T, ...){
+                 reference_dir="ReferenceFiles",ffl=T,rank=T, ...){
 
   # Κώστας - Ο έλεγχος των παραμέτρων να γίνεται άμεσα
   if ((identifier %in% c("GeneName","Refseq"))==FALSE)
@@ -331,6 +332,10 @@ RNEAv3<-function(filename,identifier="GeneName",species,
 	  miRNA_counts[z,4]=miRNA_counts[z,4]+length(deup);
 	  miRNA_counts[z,5]=miRNA_counts[z,5]+length(dedown);
 	} # for (mir...
+
+	if (ffl) {
+	  outffl=RNFfl(Network)
+	}
 
 	{
 	# for(Tf in 1:nrow(TF)){
@@ -644,6 +649,9 @@ RNEAv3<-function(filename,identifier="GeneName",species,
 	if (dir.exists(output_dir)==TRUE)
 	  output=file.path(output_dir,output)
 
+	if (ffl) {
+	  utils::write.csv(outffl,file=paste0(output,"_FFLs.csv"),quote = F,row.names = F)
+	}
 	if (rank) {
 	  P=RNRank(Network_final,...)
 	  utils::write.csv(P,file=paste0(output,"_Ranks.csv"),quote = F,row.names = T)
