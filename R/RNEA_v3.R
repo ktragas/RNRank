@@ -26,9 +26,13 @@
 #' @param output Prefix for output files
 #' @param type_of_output Type of output: (default) "csv" or "html"
 #' @param reference_dir Directory containing reference files for unsupported species
-#' @param ffl Locate and save Feed-Forward Loops
+#' @param ffl Locate and save Feed-Forward Loops by calling [RNFfl()]
 #' @param rank Call RNRank() on the resulting network and save an extra file with ranks
 #' @param ... Arguments to be passed to [RNRank()]
+#' @param verbose Shows some information during process.
+#' @param throwOnError If FALSE, in case of stopping error, returns NULL.
+#' Otherwise stop() is called.
+#'
 #' @return "Analysis completed!"
 #' @export
 #'
@@ -36,7 +40,8 @@
 RNEAv3<-function(filename,identifier="GeneName",species,
                  FC_threshold=1,PV_threshold=0.05,network="regulatory",
                  output_dir=".",output="Output",type_of_output="csv",
-                 reference_dir="ReferenceFiles",ffl=T,rank=T, ...){
+                 reference_dir="ReferenceFiles",ffl=T,rank=T, ...,
+                 verbose=F, throwOnError=T){
 
   # Κώστας - Ο έλεγχος των παραμέτρων να γίνεται άμεσα
   if ((identifier %in% c("GeneName","Refseq"))==FALSE)
@@ -94,13 +99,12 @@ RNEAv3<-function(filename,identifier="GeneName",species,
   }
 
 	Input=read.table(filename,sep="\t",header=T);
-	if(ncol(Input)==1){
-	  Total_number_of_genes=length(unique(Input[,1]));
-	}
-	if(ncol(Input)==3){
-		Total_number_of_genes=length(unique(Input[,1]));
-	}else if(ncol(Input)==14){
+	ncolInput=ncol(Input);
+	if(ncolInput==14) {
 		Total_number_of_genes=length(unique(Input[,3]));
+	} else {
+	  # Για όλες τις άλλες περιπτώσεις θεωρούμε ότι τα γονίδια είναι στην πρώτη στήλη
+	  Total_number_of_genes=length(unique(Input[,1]));
 	}
 
 	TF_counts=cbind(TF[,1],Total_number_of_genes,0,0,0,0);
@@ -129,10 +133,10 @@ RNEAv3<-function(filename,identifier="GeneName",species,
 	colnames(Network)=c("Source","Target");
 
 	# Κώστας (start)
-	ncolInput=ncol(Input);
 	if (ncolInput==14) { g_idx=3; fc_idx=10; pv_idx=12; }
 	else if (ncolInput==3) { g_idx=1; fc_idx=2; pv_idx=3; }
-	else if (ncolInput==1) { g_idx=1; }
+	else # if (ncolInput==1)
+	  { g_idx=1; }
 
 	for (line in seq_len(nrow(Input))){ # Στον παλιό κώδικα έλεγε for(line in 2:nrow(Input)) - πρώην header???
 	  if (Input[line,pv_idx]>PV_threshold) next;
@@ -161,6 +165,7 @@ RNEAv3<-function(filename,identifier="GeneName",species,
 	  }
 	}
 
+	{
 	# if(ncol(Input)==14){
 	#   for(line in 2:nrow(Input)){
 	#     if((Input[line,12]<=PV_threshold)&&(Input[line,10]>=FC_threshold)){
@@ -240,7 +245,7 @@ RNEAv3<-function(filename,identifier="GeneName",species,
 	#   }
 	# }
 	#
-
+  }
 	# Κώστας (end)
 
 	DE_genes=unique(DE_genes);
@@ -334,7 +339,7 @@ RNEAv3<-function(filename,identifier="GeneName",species,
 	} # for (mir...
 
 	if (ffl) {
-	  outffl=RNFfl(Network)
+	  outffl=RNFfl(Network, verbose, throwOnError)
 	}
 
 	{
@@ -455,13 +460,10 @@ RNEAv3<-function(filename,identifier="GeneName",species,
 		deup<-intersect(as.matrix(kegg[z,3:(2+kegg[z,1])]),as.list(UP_genes));
 		dedown<-intersect(as.matrix(kegg[z,3:(2+kegg[z,1])]),as.list(DOWN_genes));
 		de<-intersect(as.matrix(kegg[z,3:(2+kegg[z,1])]),as.list(DE_genes));
-			if(needFunctional){
-				if(length(de)>0){
-					for(f in 1:length(de)){
-						Network=rbind(Network,c(z,de[f]));
-					}
-				}
-			}
+	  if(needFunctional){
+		  if(length(de)>0)
+			  Network=rbind(Network,cbind(z,de));
+		}
 		kegg_counts[z,3]=kegg_counts[z,3]+length(de);
 		kegg_counts[z,4]=kegg_counts[z,4]+length(deup);
 		kegg_counts[z,5]=kegg_counts[z,5]+length(dedown);
@@ -472,13 +474,10 @@ RNEAv3<-function(filename,identifier="GeneName",species,
 		deup<-intersect(as.matrix(keggcat[z,3:(2+keggcat[z,1])]),as.list(UP_genes));
 		dedown<-intersect(as.matrix(keggcat[z,3:(2+keggcat[z,1])]),as.list(DOWN_genes));
 		de<-intersect(as.matrix(keggcat[z,3:(2+keggcat[z,1])]),as.list(DE_genes));
-			if(needFunctional){
-				if(length(de)>0){
-					for(f in 1:length(de)){
-						Network=rbind(Network,c(z,de[f]));
-					}
-				}
-			}
+		if(needFunctional){
+		  if(length(de)>0)
+			  Network=rbind(Network,cbind(z,de));
+		}
 		keggcat_counts[z,3]=keggcat_counts[z,3]+length(de);
 		keggcat_counts[z,4]=keggcat_counts[z,4]+length(deup);
 		keggcat_counts[z,5]=keggcat_counts[z,5]+length(dedown);
@@ -489,13 +488,10 @@ RNEAv3<-function(filename,identifier="GeneName",species,
 		deup<-intersect(as.matrix(gos[z,3:(2+gos[z,1])]),as.list(UP_genes));
 		dedown<-intersect(as.matrix(gos[z,3:(2+gos[z,1])]),as.list(DOWN_genes));
 		de<-intersect(as.matrix(gos[z,3:(2+gos[z,1])]),as.list(DE_genes));
-			if(needFunctional){
-				if(length(de)>0){
-					for(f in 1:length(de)){
-						Network=rbind(Network,c(z,de[f]));
-					}
-				}
-			}
+		if(needFunctional){
+		  if(length(de)>0)
+			  Network=rbind(Network,cbind(z,de));
+		}
 		go_counts[z,3]=go_counts[z,3]+length(de);
 		go_counts[z,4]=go_counts[z,4]+length(deup);
 		go_counts[z,5]=go_counts[z,5]+length(dedown);
@@ -653,7 +649,7 @@ RNEAv3<-function(filename,identifier="GeneName",species,
 	  write.csv(outffl,file=paste0(output,"_FFLs.csv"),quote = F,row.names = F)
 	}
 	if (rank) {
-	  P=RNRank(Network_final,...)
+	  P=RNRank(Network_final,...,verbose=verbose,throwOnError = throwOnError)
 	  write.csv(P,file=paste0(output,"_Ranks.csv"),quote = F,row.names = T)
 	}
 	write.csv(Network_final,file=paste0(output,"_Network.csv"),quote=F,row.names=F);

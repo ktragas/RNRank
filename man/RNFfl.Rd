@@ -4,11 +4,16 @@
 \alias{RNFfl}
 \title{Locate feed-forward loops in regulatory network}
 \usage{
-RNFfl(network)
+RNFfl(network, verbose = F, throwOnError = T)
 }
 \arguments{
 \item{network}{Two-column gene matrix. Every row contains one regulating
 and one regulated gene.}
+
+\item{verbose}{Shows some information during process.}
+
+\item{throwOnError}{If FALSE, in case of stopping error, returns NULL.
+Otherwise stop() is called.}
 }
 \value{
 3-column matrix of FFLs. Column X regulates columns Y and Z.

@@ -6,7 +6,7 @@
 \title{Rank by gene importance}
 \usage{
 RNRank(
-  srcm,
+  network,
   damping = 1,
   max_iterations = 100,
   threshold = 0,
@@ -19,7 +19,7 @@ RNRank(
 )
 }
 \arguments{
-\item{srcm}{Two-column gene matrix. Every row contains one regulating
+\item{network}{Two-column gene matrix. Every row contains one regulating
 and one regulated gene.}
 
 \item{damping}{Damping factor (0-1) defining percentage of non-randomness.}

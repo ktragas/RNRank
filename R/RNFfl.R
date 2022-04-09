@@ -4,25 +4,34 @@
 #'
 #' @param network Two-column gene matrix. Every row contains one regulating
 #' and one regulated gene.
+#' @param verbose Shows some information during process.
+#' @param throwOnError If FALSE, in case of stopping error, returns NULL.
+#' Otherwise stop() is called.
 #'
 #' @return 3-column matrix of FFLs. Column X regulates columns Y and Z.
 #' Column Y regulates Z, too.
 #' @export
 #'
 #' @examples
-RNFfl<-function(network)
+RNFfl<-function(network,verbose=F, throwOnError=T)
 {
   # Εντοπισμός FFL στο υποδίκτυο
   #        X---->Y---->Z
   #         \----->---/
   # ------------------------------
 
-  # Αφαιρώ διπλές εγγραφές και εγγραφές αυτορρύθμισης και αρχικοποιώ πίνακα FFL
+  # Έλεγχος παραμέτρων
+  if (!isValidNetworkMatrix(network,throwOnError))
+    return(NULL)
+
+  # Αφαιρώ διπλές εγγραφές και εγγραφές αυτορρύθμισης
+  # και αρχικοποιώ πίνακα FFL και μετρητές
   network=unique(network)
   sn=which(network[,1]==network[,2])
   network=network[-sn,]
   ffl=matrix(nrow=0,ncol=3)
   colnames(ffl)=c("X","Y","Z")
+  count_ffl=0
 
   # Εντοπίζω όλα τα γονίδια από τα οποία ξεκινάει ακμή και τα θεωρώ
   # αρχή (x) πιθανού FFL
@@ -54,5 +63,14 @@ RNFfl<-function(network)
       ffl=rbind(ffl,cbind(x,y,z))
     } # for (z...
   } # for (x...
+  rownames(ffl)=NULL
+  if (verbose) {
+    n=nrow(ffl)
+    if (n>0)
+      msg=sprintf("Found %d FFLs consisting of %d different genes",n,length(unique(c(ffl))))
+    else
+      msg("FFLs not found")
+    print(msg)
+  }
   return(ffl)
 } # end function

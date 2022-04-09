@@ -17,7 +17,9 @@ RNEAv3(
   reference_dir = "ReferenceFiles",
   ffl = T,
   rank = T,
-  ...
+  ...,
+  verbose = F,
+  throwOnError = T
 )
 }
 \arguments{
@@ -41,11 +43,16 @@ RNEAv3(
 
 \item{reference_dir}{Directory containing reference files for unsupported species}
 
-\item{ffl}{Locate and save Feed-Forward Loops}
+\item{ffl}{Locate and save Feed-Forward Loops by calling \code{\link[=RNFfl]{RNFfl()}}}
 
 \item{rank}{Call RNRank() on the resulting network and save an extra file with ranks}
 
 \item{...}{Arguments to be passed to \code{\link[=RNRank]{RNRank()}}}
+
+\item{verbose}{Shows some information during process.}
+
+\item{throwOnError}{If FALSE, in case of stopping error, returns NULL.
+Otherwise stop() is called.}
 }
 \value{
 "Analysis completed!"

@@ -3,7 +3,7 @@
 #' @description Infers importance of Regulatory Network nodes (genes),
 #' by using a Google's PageRank-like algorithm.
 #'
-#' @param srcm Two-column gene matrix. Every row contains one regulating
+#' @param network Two-column gene matrix. Every row contains one regulating
 #' and one regulated gene.
 #' @param max_iterations Maximum number of iterations, if not converging earlier (minimum 10).
 #' @param threshold Euclidean distance between iterations less than or equal to the threshold
@@ -23,16 +23,13 @@
 #' @export
 #'
 #' @examples
-RNRank = function(srcm, damping=1.0, max_iterations=100, threshold=0,
+RNRank = function(network, damping=1.0, max_iterations=100, threshold=0,
                   self=F, letZeros=F, divider=100.0, sorted=T,
                   verbose=F, throwOnError=T)
 {
   # Έλεγχος παραμέτρων
-  if (!is.matrix(srcm) || ncol(srcm)<2 || nrow(srcm)<2 || typeof(srcm)!="character") {
-    if (throwOnError)
-      stop("Need character matrix with at least 2 rows and 2 columns. Can't continue")
+  if (!isValidNetworkMatrix(network,throwOnError))
     return(NULL)
-  }
 
   warn=function(x) {
     msg=sprintf("Invalid value for \"%s\". Adjusted to %d",deparse(substitute(x)),x)
@@ -58,10 +55,10 @@ RNRank = function(srcm, damping=1.0, max_iterations=100, threshold=0,
 
   # Αφαιρώ γονίδια που αυτορρυθμίζονται (source==target)
   if (!self) {
-    sn=which(srcm[,1]==srcm[,2])
-    m=srcm[-sn,]
+    sn=which(network[,1]==network[,2])
+    m=network[-sn,]
   } else
-    m=srcm
+    m=network
 
   # Ταξινόμηση κατά μειούμενο πλήθος στόχων - Προαιρετικό
   m1=matrix(ncol=2,nrow=0)

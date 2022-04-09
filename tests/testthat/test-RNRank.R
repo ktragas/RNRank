@@ -12,7 +12,7 @@ test_that("RNRank works", {
              self=T, letZeros = T, divider = 1000.0, verbose = T)
     print(head(P,10))
     barplot(P[1:min(length(P),30),1],las=2,main="Most important genes")
-    rm(RNEA_output_file,srcm,P)
+    rm(OutputPath,RNEA_output_file,srcm,P)
   })
 })
 
