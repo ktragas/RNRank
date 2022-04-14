@@ -29,9 +29,7 @@
 #' @param ffl Locate and save Feed-Forward Loops by calling [RNFfl()]
 #' @param rank Call RNRank() on the resulting network and save an extra file with ranks
 #' @param ... Arguments to be passed to [RNRank()]
-#' @param verbose Shows some information during process.
-#' @param throwOnError If FALSE, in case of stopping error, returns NULL.
-#' Otherwise stop() is called.
+#' @eval common_params()
 #'
 #' @return "Analysis completed!"
 #' @export
@@ -510,8 +508,8 @@ RNEAv3<-function(filename,identifier="GeneName",species,
 	  colnames(ResultsTFtemp)=c("DE_pvalue","UP_pvalue","DOWN_pvalue");
 	  for(i in 1:length(DE_rows)){
 	    r=DE_rows[i];
-	    # Hypergeometric Distr.   # White_Drawn   Total_White                 Total_Black                  Total_Drawn
-	                              # TargetsDE     TotalDE                     TotalNDE                     Targets
+	    # Hypergeometric Distr.          # White_Drawn   Total_White                 Total_Black                  Total_Drawn
+	                                     # TargetsDE     TotalDE                     TotalNDE                     Targets
 	    ResultsTFtemp[i,1]<-stats::phyper(TF_counts[r,4],Number_of_DE_genes,(TF_counts[r,2]-Number_of_DE_genes), TF_counts[r,1],lower.tail=FALSE);
 	    ResultsTFtemp[i,2]<-stats::phyper(TF_counts[r,5],Number_of_Up_genes,(TF_counts[r,2]-Number_of_Up_genes), TF_counts[r,1],lower.tail=FALSE);
 	    ResultsTFtemp[i,3]<-stats::phyper(TF_counts[r,6],Number_of_Down_genes,(TF_counts[r,2]-Number_of_Down_genes), TF_counts[r,1],lower.tail=FALSE);

@@ -1,4 +1,4 @@
-test_that("RNRank works", {
+test_that("RNFfl works", {
   expect_output({
     OutputPath=file.path(rprojroot::find_root(rprojroot::has_dir("tests")),"Output")
     RNEA_output_file=file.path(OutputPath,

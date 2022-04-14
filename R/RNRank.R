@@ -1,10 +1,14 @@
+#' @keywords internal
+#' @importFrom utils read.table write.csv
+#' @aliases RNRank-package
+"_PACKAGE"
+
 #' Rank by gene importance
 #'
 #' @description Infers importance of Regulatory Network nodes (genes),
 #' by using a Google's PageRank-like algorithm.
 #'
-#' @param network Two-column gene matrix. Every row contains one regulating
-#' and one regulated gene.
+#' @eval net_param()
 #' @param max_iterations Maximum number of iterations, if not converging earlier (minimum 10).
 #' @param threshold Euclidean distance between iterations less than or equal to the threshold
 #' will terminate calculations
@@ -15,16 +19,15 @@
 #' @param divider Divides the percentage used for dangling genes,
 #' to use it for random regulations from regulating genes (minimum 10).
 #' @param sorted Results sorted by descending percentage (T) or unsorted (F).
-#' @param verbose Shows some information during process.
-#' @param throwOnError If FALSE, in case of stopping error, returns NULL.
-#' Otherwise stop() is called.
+#' @param preorder Sort input matrix, so that regulating genes with more targets are first.
+#' @eval common_params()
 #'
 #' @return Named 1-column matrix of percentages (0-1).
 #' @export
 #'
 #' @examples
 RNRank = function(network, damping=1.0, max_iterations=100, threshold=0,
-                  self=F, letZeros=F, divider=100.0, sorted=T,
+                  self=F, letZeros=F, divider=100.0, sorted=T, preorder=F,
                   verbose=F, throwOnError=T)
 {
   # Έλεγχος παραμέτρων
@@ -54,25 +57,31 @@ RNRank = function(network, damping=1.0, max_iterations=100, threshold=0,
   }
 
   # Αφαιρώ γονίδια που αυτορρυθμίζονται (source==target)
+  m=network
   if (!self) {
     sn=which(network[,1]==network[,2])
-    m=network[-sn,]
-  } else
-    m=network
-
-  # Ταξινόμηση κατά μειούμενο πλήθος στόχων - Προαιρετικό
-  m1=matrix(ncol=2,nrow=0)
-  colnames(m1)=colnames(m)
-
-  # s: Ρυθμίζοντα γονίδια (source)
-  s=names(sort(table(m[,1]),decreasing = T))
-
-  for (i in seq_along(s)) {
-    m1=rbind(m1,m[which(m[,1]==s[i]),])
+    if (length(sn)>0)
+      m=m[-sn,]
   }
-  m=m1
-  rm(m1)
-  # Τέλος ταξινόμησης
+
+  if (preorder) {
+    # Ταξινόμηση κατά μειούμενο πλήθος στόχων - Προαιρετικό
+    m1=matrix(ncol=2,nrow=0)
+    colnames(m1)=colnames(m)
+
+    # s: Ρυθμίζοντα γονίδια (source)
+    s=names(sort(table(m[,1]),decreasing = T))
+
+    for (i in seq_along(s)) {
+      m1=rbind(m1,m[which(m[,1]==s[i]),])
+    }
+    m=m1
+    rm(m1)
+    # Τέλος ταξινόμησης
+  } else {
+    # s: Ρυθμίζοντα γονίδια (source)
+    s=unique(m[,1])
+  }
 
   # Συνολικά γονίδια που συμμετέχουν στα υποδίκτυα (είτε ρυθμίζοντα, είτε ρυθμιζόμενα)
   g=unique(c(m)) # ~ union(unique(m[,1]),unique(m[,2]))
@@ -152,8 +161,8 @@ RNRank = function(network, damping=1.0, max_iterations=100, threshold=0,
     # }
     I1=H%*%I
     e=sqrt(sum((I1 - I)^2))  # Ευκλίδεια απόσταση τρέχοντος βήματος από το προηγούμενο
-    if (e<=threshold) break # Σύγκλιση
     I=I1
+    if (e<=threshold) break  # Ικανοποιητική σύγκλιση
   }
   if (verbose)
     print(sprintf("Finished in %d iterations",i))

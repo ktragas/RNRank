@@ -51,8 +51,7 @@ RNEAv3(
 
 \item{verbose}{Shows some information during process.}
 
-\item{throwOnError}{If FALSE, in case of stopping error, returns NULL.
-Otherwise stop() is called.}
+\item{throwOnError}{If FALSE, in case of stopping error, returns NULL. Otherwise \code{\link[base:stop]{base::stop()}} is called.}
 }
 \value{
 "Analysis completed!"

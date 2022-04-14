@@ -2,11 +2,8 @@
 #'
 #' @description Locate feed-forward loops in regulatory network.
 #'
-#' @param network Two-column gene matrix. Every row contains one regulating
-#' and one regulated gene.
-#' @param verbose Shows some information during process.
-#' @param throwOnError If FALSE, in case of stopping error, returns NULL.
-#' Otherwise stop() is called.
+#' @eval net_param()
+#' @eval common_params()
 #'
 #' @return 3-column matrix of FFLs. Column X regulates columns Y and Z.
 #' Column Y regulates Z, too.
@@ -25,13 +22,13 @@ RNFfl<-function(network,verbose=F, throwOnError=T)
     return(NULL)
 
   # Αφαιρώ διπλές εγγραφές και εγγραφές αυτορρύθμισης
-  # και αρχικοποιώ πίνακα FFL και μετρητές
+  # και αρχικοποιώ πίνακα FFL
   network=unique(network)
+  ngenes=length(unique(c(network)))
   sn=which(network[,1]==network[,2])
   network=network[-sn,]
   ffl=matrix(nrow=0,ncol=3)
   colnames(ffl)=c("X","Y","Z")
-  count_ffl=0
 
   # Εντοπίζω όλα τα γονίδια από τα οποία ξεκινάει ακμή και τα θεωρώ
   # αρχή (x) πιθανού FFL
@@ -67,7 +64,8 @@ RNFfl<-function(network,verbose=F, throwOnError=T)
   if (verbose) {
     n=nrow(ffl)
     if (n>0)
-      msg=sprintf("Found %d FFLs consisting of %d different genes",n,length(unique(c(ffl))))
+      msg=sprintf("Found %d FFLs consisting of %d (out of %d) different genes",
+                  n,length(unique(c(ffl))),ngenes)
     else
       msg("FFLs not found")
     print(msg)

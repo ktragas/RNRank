@@ -3,7 +3,7 @@ Title: Gene Ranking In Inferred Active Regulatory Network
 Version: 0.2.1.9000
 Authors@R: 
     person("Konstantinos", "Tragkas", , "std507586@ac.eap.gr", role = c("aut", "cre"),
-           comment = c(ORCID = "YOUR-ORCID-ID"))
+           comment = c(ORCID = "0000-0001-6181-8904"))
 Description: Infers active regulatory networks from gene expression data 
   using a combination of prior knowledge and enrichment analysis and ranks 
   the genes in them.
