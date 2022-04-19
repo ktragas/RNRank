@@ -1,3 +1,9 @@
+# RNRank 0.2.2.9000
+
+* Added functions, test and supporting data to create new reference files 
+* All external files moved to Git Large File Storage
+* Minor fixes
+
 # RNRank 0.2.1.9000
 
 * Added a `NEWS.md` file to track changes to the package.

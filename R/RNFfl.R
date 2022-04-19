@@ -67,7 +67,7 @@ RNFfl<-function(network,verbose=F, throwOnError=T)
       msg=sprintf("Found %d FFLs consisting of %d (out of %d) different genes",
                   n,length(unique(c(ffl))),ngenes)
     else
-      msg("FFLs not found")
+      msg="FFLs not found"
     print(msg)
   }
   return(ffl)

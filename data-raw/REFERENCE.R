@@ -4,21 +4,22 @@ TF_mouse=miRNA_mouse=kegg_mouse=keggcat_mouse=gos_mouse=NULL
 TF=miRNA=kegg=keggcat=gos=NULL
 RefPath=system.file("extdata","ReferenceFiles/",package="RNRank")
 for (species in c("Human","Mouse")) {
-  TF_ref=file.path(RefPath,paste0(species,"_TF_plus_oreganno_trrust.tsv"));
+  # TF_ref=file.path(RefPath,paste0(species,"_TF_plus_oreganno_trrust.tsv"));
+  TF_ref=file.path(RefPath,paste0(species,"_TF_Reference.tsv"));
   miRNA_ref=file.path(RefPath,paste0(species,"_miRNAs.tsv"));
   kegg_ref=file.path(RefPath,paste0(species,"_kegg.tsv",sep=""));
   keggcat_ref=file.path(RefPath,paste0(species,"_keggcat.tsv"));
   GOs_ref=file.path(RefPath,paste0(species,"_GOs.tsv"));
 
-  TF=utils::read.table(TF_ref,sep="\t",fill=T);
+  TF=read.table(TF_ref,sep="\t",fill=T);
   rownames(TF)=TF[,2];
-  miRNA=utils::read.table(miRNA_ref,sep="\t",fill=T);
+  miRNA=read.table(miRNA_ref,sep="\t",fill=T);
   rownames(miRNA)=miRNA[,2];
-  kegg=utils::read.table(kegg_ref,sep="\t",fill=T);
+  kegg=read.table(kegg_ref,sep="\t",fill=T);
   rownames(kegg)=kegg[,2];
-  keggcat=utils::read.table(keggcat_ref,sep="\t",fill=T);
+  keggcat=read.table(keggcat_ref,sep="\t",fill=T);
   rownames(keggcat)=keggcat[,2];
-  gos=utils::read.table(GOs_ref,sep="\t",fill=T);
+  gos=read.table(GOs_ref,sep="\t",fill=T);
   rownames(gos)=gos[,2];
   if (species=="Human") {
     TF_human=TF

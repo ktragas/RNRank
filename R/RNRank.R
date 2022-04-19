@@ -1,5 +1,5 @@
 #' @keywords internal
-#' @importFrom utils read.table write.csv
+#' @importFrom utils read.table write.csv write.table
 #' @aliases RNRank-package
 "_PACKAGE"
 

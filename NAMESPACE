@@ -3,5 +3,8 @@
 export(RNEAv3)
 export(RNFfl)
 export(RNRank)
+export(produce_reference)
+export(produce_reference_from_files)
 importFrom(utils,read.table)
 importFrom(utils,write.csv)
+importFrom(utils,write.table)

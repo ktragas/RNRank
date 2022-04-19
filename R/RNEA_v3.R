@@ -13,12 +13,14 @@
 #' In this way, given a genome-wide expression experiment, RNEA prioritizes important regulatory and functional components.
 #' It also succeeds to reconstruct meaningful subnetworks of gene regulation, offering further ways of analyzing the data based on network theory.
 #' A detailed guide describing RNEA's use can be found [here](https://sites.google.com/a/fleming.gr/rnea/manual).
-#'  Additionally RNEA can extract a global regularory/functional network with the "activated" regulators, their target genes and functional categories whose members are overrepresented among differentially expressed genes.
-#'  This network, although sometimes huge, gives a complete view in both functional and regulatory components affected at the system studied.
+#' Additionally RNEA can extract a global regularory/functional network with the "activated" regulators, their target genes and functional categories whose members are overrepresented among differentially expressed genes.
+#' This network, although sometimes huge, gives a complete view in both functional and regulatory components affected at the system studied.
 #'
 #' @param filename Differential expression file (Cuffdiff, 3-column, 1-column)
 #' @param identifier default "GeneName" or (not working) "RefSeq"
-#' @param species Organism: "Human" or "Mouse"
+#' @param species Organism. "Human","Mouse" datasets exist in package.
+#' If any other, the relevant reference file must be provided in `reference_dir`.
+#' @param internal_data If `TRUE` the package's internal datasets are used
 #' @param FC_threshold log2FC threshold
 #' @param PV_threshold p-value threshold
 #' @param network Needed output: "global" or (default) "regulatory" or "functional"
@@ -35,7 +37,7 @@
 #' @export
 #'
 #' @examples
-RNEAv3<-function(filename,identifier="GeneName",species,
+RNEAv3<-function(filename,identifier="GeneName",species,internal_data=T,
                  FC_threshold=1,PV_threshold=0.05,network="regulatory",
                  output_dir=".",output="Output",type_of_output="csv",
                  reference_dir="ReferenceFiles",ffl=T,rank=T, ...,
@@ -44,8 +46,8 @@ RNEAv3<-function(filename,identifier="GeneName",species,
   # Κώστας - Ο έλεγχος των παραμέτρων να γίνεται άμεσα
   if ((identifier %in% c("GeneName","Refseq"))==FALSE)
     warning("Please select a supported gene identifier (\"GeneName\" or \"Refseq\")");
-  if ((species %in% c("Mouse","Human"))==FALSE)
-    warning("\"Mouse\" and \"Human\" are the only species supported as of now");
+  if (internal_data==TRUE && (species %in% c("Mouse","Human"))==FALSE)
+    warning("\"Mouse\" and \"Human\" are the only species supported internally as of now");
   if ((type_of_output %in% c("html","csv"))==FALSE)
     warning("Please select type of output to be either \"html\" or \"csv\"")
   if ((network %in% c("global","functional","regulatory"))==FALSE)
@@ -60,8 +62,8 @@ RNEAv3<-function(filename,identifier="GeneName",species,
 		Refseq=read.table("ReferenceFiles/Refseq2Gene.txt",row.names=2,sep="\t");
   }
 
-  if (species %in% c("Human","Mouse")) {
-    # Για άνθρωπο και ποντίκι τα δεδομένα περιέχονται στο πακέτο
+  if (internal_data && species %in% c("Human","Mouse")) {
+    # Αν έχουν ζητηθεί τα δεδομένα που περιέχονται στο πακέτο για άνθρωπο ή ποντίκι
     if (species=="Human") {
 #      utils::data(TF_human,miRNA_human,kegg_human,keggcat_human,gos_human)
       TF=TF_human
@@ -77,8 +79,9 @@ RNEAv3<-function(filename,identifier="GeneName",species,
       keggcat=keggcat_mouse
       gos=gos_mouse
     }
-  } else { # Not human or mouse
-   	TF_ref=file.path(reference_dir,paste(species,"_TF_plus_oreganno_trrust.tsv",sep=""));
+  } else { # Don't use internal human or mouse data
+   	# TF_ref=file.path(reference_dir,paste(species,"_TF_plus_oreganno_trrust.tsv",sep=""));
+   	TF_ref=file.path(reference_dir,paste(species,"_TF_Reference.tsv",sep=""));
  	  miRNA_ref=file.path(reference_dir,paste(species,"_miRNAs.tsv",sep=""));
  	  kegg_ref=file.path(reference_dir,paste(species,"_kegg.tsv",sep=""));
  	  keggcat_ref=file.path(reference_dir,paste(species,"_keggcat.tsv",sep=""));

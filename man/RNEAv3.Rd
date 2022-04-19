@@ -8,6 +8,7 @@ RNEAv3(
   filename,
   identifier = "GeneName",
   species,
+  internal_data = T,
   FC_threshold = 1,
   PV_threshold = 0.05,
   network = "regulatory",
@@ -27,7 +28,10 @@ RNEAv3(
 
 \item{identifier}{default "GeneName" or (not working) "RefSeq"}
 
-\item{species}{Organism: "Human" or "Mouse"}
+\item{species}{Organism. "Human","Mouse" datasets exist in package.
+If any other, the relevant reference file must be provided in \code{reference_dir}.}
+
+\item{internal_data}{If \code{TRUE} the package's internal datasets are used}
 
 \item{FC_threshold}{log2FC threshold}
 
