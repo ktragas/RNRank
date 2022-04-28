@@ -15,3 +15,21 @@ common_params<-function() {
     "@param throwOnError If FALSE, in case of stopping error, returns NULL. Otherwise [base::stop()] is called."
   )
 }
+
+makeNetFromReference<-function(species="Mouse",reference_dir="?")
+{
+   if (reference_dir=="?") {
+     reference_dir=system.file("extdata","ReferenceFiles",package="RNRank")
+   }
+   TF_ref=file.path(reference_dir,paste0(species,"_TF_Reference.tsv"));
+   TF=read.table(TF_ref,sep="\t",fill=T);
+   rownames(TF)=TF[,2];
+   Network=matrix(ncol=2,nrow=0)
+   colnames(Network)=c("Source","Target");
+   Network=do.call("rbind", apply(TF,1,function(x) {
+     last_index=2+as.integer(x[1])
+     rbind(Network,cbind(x[2],x[3:last_index]))
+   }))
+   rownames(Network)=NULL
+   return(Network)
+}

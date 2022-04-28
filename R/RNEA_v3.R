@@ -81,11 +81,11 @@ RNEAv3<-function(filename,identifier="GeneName",species,internal_data=T,
     }
   } else { # Don't use internal human or mouse data
    	# TF_ref=file.path(reference_dir,paste(species,"_TF_plus_oreganno_trrust.tsv",sep=""));
-   	TF_ref=file.path(reference_dir,paste(species,"_TF_Reference.tsv",sep=""));
- 	  miRNA_ref=file.path(reference_dir,paste(species,"_miRNAs.tsv",sep=""));
- 	  kegg_ref=file.path(reference_dir,paste(species,"_kegg.tsv",sep=""));
- 	  keggcat_ref=file.path(reference_dir,paste(species,"_keggcat.tsv",sep=""));
-   	GOs_ref=file.path(reference_dir,paste(species,"_GOs.tsv",sep=""));
+   	TF_ref=file.path(reference_dir,paste0(species,"_TF_Reference.tsv"));
+ 	  miRNA_ref=file.path(reference_dir,paste0(species,"_miRNAs.tsv"));
+ 	  kegg_ref=file.path(reference_dir,paste0(species,"_kegg.tsv"));
+ 	  keggcat_ref=file.path(reference_dir,paste0(species,"_keggcat.tsv"));
+   	GOs_ref=file.path(reference_dir,paste0(species,"_GOs.tsv"));
 
    	TF=read.table(TF_ref,sep="\t",fill=T);
   	rownames(TF)=TF[,2];

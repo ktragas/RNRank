@@ -129,6 +129,7 @@ RNRank = function(network, damping=1.0, max_iterations=100, threshold=0,
     H[cur_targets,cur]=perc
   }
 
+  # Εφαρμογή συντελεστή απόσβεσης
   H=damping*H+((1.0-damping)/divl)
   if (!self)
     diag(H)=0

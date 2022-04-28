@@ -26,7 +26,8 @@ RNFfl<-function(network,verbose=F, throwOnError=T)
   network=unique(network)
   ngenes=length(unique(c(network)))
   sn=which(network[,1]==network[,2])
-  network=network[-sn,]
+  if (length(sn)>0)
+    network=network[-sn,]
   ffl=matrix(nrow=0,ncol=3)
   colnames(ffl)=c("X","Y","Z")
 

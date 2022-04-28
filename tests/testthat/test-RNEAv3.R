@@ -14,7 +14,7 @@ test_that("RNEAv3 works", {
         reference_dir=ReferenceDir,output_dir=OutputPath,
         #output="gene_exp_out"
         output="GSE63889"
-        ,rank=T,max_iterations = 200, threshold=0.01, damping=0.85,
+        ,rank=T,max_iterations = 200, threshold=0.001, damping=0.85,
         self=T, letZeros = T, divider = 1000.0, verbose = T
         )
 
