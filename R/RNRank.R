@@ -1,3 +1,9 @@
+#' RNRank: A package for gene ranking in inferred active regulatory network
+#'
+#' The RNRank package provides five  functions:
+#' [RNEAv3()], [RNRank()], [RNFfl()], [produce_reference()] and [produce_reference_from_files()]
+#'
+#' @docType package
 #' @keywords internal
 #' @importFrom utils read.table write.csv write.table
 #' @aliases RNRank-package
@@ -10,11 +16,11 @@
 #'
 #' @eval net_param()
 #' @param max_iterations Maximum number of iterations, if not converging earlier (minimum 10).
-#' @param threshold Euclidean distance between iterations less than or equal to the threshold
+#' @param threshold Euclidean distance between iterations less than or equal to this value
 #' will terminate calculations
 #' @param damping Damping factor (0-1) defining percentage of non-randomness.
-#' @param self Self regulations permitted (T) or not (F).
-#' @param letZeros FALSE to allow random regulations from regulating genes
+#' @param self Self regulations permitted (`TRUE`) or not (`FALSE`).
+#' @param letZeros Set to `FALSE` to allow random regulations from regulating genes
 #' to those not normally regulated.
 #' @param divider Divides the percentage used for dangling genes,
 #' to use it for random regulations from regulating genes (minimum 10).
@@ -26,7 +32,7 @@
 #' @export
 #'
 #' @examples
-RNRank = function(network, damping=1.0, max_iterations=100, threshold=0,
+RNRank = function(network, damping=0.85, max_iterations=100, threshold=0,
                   self=F, letZeros=F, divider=100.0, sorted=T, preorder=F,
                   verbose=F, throwOnError=T)
 {
@@ -40,7 +46,10 @@ RNRank = function(network, damping=1.0, max_iterations=100, threshold=0,
   }
 
   if (damping<0 || damping>1) {
-    damping=1
+    if (damping<0)
+      damping=0
+    else #if (damping>1)
+      damping=1
     warn(damping)
   }
   if (max_iterations<10) {

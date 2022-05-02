@@ -6,7 +6,7 @@
 \usage{
 RNRank(
   network,
-  damping = 1,
+  damping = 0.85,
   max_iterations = 100,
   threshold = 0,
   self = F,
@@ -25,12 +25,12 @@ RNRank(
 
 \item{max_iterations}{Maximum number of iterations, if not converging earlier (minimum 10).}
 
-\item{threshold}{Euclidean distance between iterations less than or equal to the threshold
+\item{threshold}{Euclidean distance between iterations less than or equal to this value
 will terminate calculations}
 
-\item{self}{Self regulations permitted (T) or not (F).}
+\item{self}{Self regulations permitted (\code{TRUE}) or not (\code{FALSE}).}
 
-\item{letZeros}{FALSE to allow random regulations from regulating genes
+\item{letZeros}{Set to \code{FALSE} to allow random regulations from regulating genes
 to those not normally regulated.}
 
 \item{divider}{Divides the percentage used for dangling genes,

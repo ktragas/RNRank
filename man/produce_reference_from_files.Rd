@@ -16,13 +16,13 @@ produce_reference_from_files(
 )
 }
 \arguments{
-\item{pi_file}{Protein interactions from STRING (fully detailed, with header)}
+\item{pi_file}{Protein interactions from STRING (fully detailed)}
 
-\item{tf_file}{Transcription factors (Tab separated, with header)}
+\item{tf_file}{Transcription factors}
 
 \item{tf_column}{Column containing gene name of TFs}
 
-\item{bm_file}{Protein-gene matching from Biomart (N:1, comma separated, with header)}
+\item{bm_file}{Protein-gene matching from Biomart (N:1)}
 
 \item{out_file}{Results will be saved to this tab-separated file}
 
@@ -37,5 +37,5 @@ Result of \code{\link[=produce_reference]{produce_reference()}} or NULL in case 
 }
 \description{
 Produces and saves a file with a list of Transcription Factors interactions,
-by combining information from provided files#'
+by combining information from provided files.
 }

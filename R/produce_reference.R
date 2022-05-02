@@ -11,7 +11,7 @@
 #' @param tf Transcription factors (gene names).
 #' @param biomart Protein-Gene matching table. Normally from BioMart database.
 #' @param org_id STRING organism ID. If specified, it is assumed that protein names
-#' in the interactions table will have the form \emph{<org_id>.<protein>}.
+#' in the interactions table will have the form *<org_id>.<protein>*.
 #' @param thresholdCols Column numbers in protein interactions dataset,
 #' to be checked against thresholds
 #' @param thresholds Respective thresholds for thresholdCols.

@@ -3,12 +3,12 @@
 #' @title  Produce a list of Transcription Factors interactions
 #'
 #' @description Produces and saves a file with a list of Transcription Factors interactions,
-#' by combining information from provided files#'
+#' by combining information from provided files.
 #'
-#' @param pi_file Protein interactions from STRING (fully detailed, with header)
-#' @param tf_file Transcription factors (Tab separated, with header)
+#' @param pi_file Protein interactions from STRING (fully detailed)
+#' @param tf_file Transcription factors
 #' @param tf_column Column containing gene name of TFs
-#' @param bm_file Protein-gene matching from Biomart (N:1, comma separated, with header)
+#' @param bm_file Protein-gene matching from Biomart (N:1)
 #' @param out_file Results will be saved to this tab-separated file
 #' @param headers header parameter for [utils::read.table()] for each of the 3 input files
 #' @param seps sep parameter for [utils::read.table()] for each of the 3 input files

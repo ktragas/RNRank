@@ -19,3 +19,4 @@ inst/extdata/ReferenceFiles/Human_miRNAs.tsv filter=lfs diff=lfs merge=lfs -text
 inst/extdata/ReferenceFiles/Mouse_GOs.tsv filter=lfs diff=lfs merge=lfs -text
 inst/extdata/ReferenceFiles/Mouse_kegg.tsv filter=lfs diff=lfs merge=lfs -text
 inst/extdata/ReferenceFiles/Mouse_keggcat.tsv filter=lfs diff=lfs merge=lfs -text
+inst/extdata/Input/* filter=lfs diff=lfs merge=lfs -text

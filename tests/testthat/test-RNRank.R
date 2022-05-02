@@ -26,12 +26,15 @@ test_that("RNRank works", {
     OutputPath=file.path(rprojroot::find_root(rprojroot::has_dir("tests")),"Output")
     RNEA_output_file=file.path(OutputPath,paste0(#"gene_exp_out"
                                                  "GSE63889"
+                                                 #"GSE182432"
                                                  ,"_Network.csv"))
     srcm=as.matrix(read.table(RNEA_output_file,header=T,sep=","))
     P=RNRank(srcm, max_iterations = 200, threshold=0.001, damping=0.85,
              self=T, letZeros = T, divider = 1000.0, verbose = T)
     print(head(P,10))
-    barplot(P[1:min(length(P),30),1],las=2,main="Most important genes")
+    # barplot(P[1:min(length(P),30),1],las=2,main="Most important genes")
+    barplot(P[min(length(P),20):1,1],las=2,main="Most important genes",
+            horiz=T,cex.names=0.8,width=10,space=0.4)
     rm(OutputPath,RNEA_output_file,srcm,P)
   })
 })
