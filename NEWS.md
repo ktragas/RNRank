@@ -1,3 +1,9 @@
+# RNRank 0.2.3.9000
+
+* Favoring of regulations 
+* Documentation
+* Tests expanded
+
 # RNRank 0.2.2.9000
 
 * Added functions, test and supporting data to create new reference files 

@@ -14,27 +14,38 @@
 #' @description Infers importance of Regulatory Network nodes (genes),
 #' by using a Google's PageRank-like algorithm.
 #'
+#' @details `favored` contains gene names and is treated differently,
+#' depending on it being a vector or a matrix and if it is a matrix,
+#' depending on the number of columns. In any other case, it is ignored.
+#'
+#' * Vector or 1-column matrix: The regulations with any other gene are favored.
+#' * 2 columns: Considered to contain directed edges. Exactly these regulations are favored.
+#' * More columns: Considered to contain FFLs in the first three columns
+#'  (as the matrix returned from [RNFfl()]). The regulations C1->C2, C1->C3 and C2->C3 are favored.
+#'
 #' @eval net_param()
 #' @param max_iterations Maximum number of iterations, if not converging earlier (minimum 10).
 #' @param threshold Euclidean distance between iterations less than or equal to this value
 #' will terminate calculations
-#' @param damping Damping factor (0-1) defining percentage of non-randomness.
+#' @param damping Damping factor (0-1) defining probability of non-randomness.
 #' @param self Self regulations permitted (`TRUE`) or not (`FALSE`).
 #' @param letZeros Set to `FALSE` to allow random regulations from regulating genes
 #' to those not normally regulated.
-#' @param divider Divides the percentage used for dangling genes,
+#' @param divider Divides the probability used for dangling genes,
 #' to use it for random regulations from regulating genes (minimum 10).
-#' @param sorted Results sorted by descending percentage (T) or unsorted (F).
+#' @param sorted Results sorted by descending probability (T) or unsorted (F).
 #' @param preorder Sort input matrix, so that regulating genes with more targets are first.
+#' @param favored Regulations or genes, favored for better ranking. See 'Details'.
+#' @param favoring Multiplier of favored regulations.
 #' @eval common_params()
 #'
-#' @return Named 1-column matrix of percentages (0-1).
+#' @return Named 1-column matrix of probabilities (0-1).
 #' @export
 #'
 #' @examples
 RNRank = function(network, damping=0.85, max_iterations=100, threshold=0,
-                  self=F, letZeros=F, divider=100.0, sorted=T, preorder=F,
-                  verbose=F, throwOnError=T)
+                  self=T, letZeros=F, divider=100.0, sorted=T, preorder=F,
+                  favored=NULL, favoring=1.1, verbose=F, throwOnError=T)
 {
   # Έλεγχος παραμέτρων
   if (!isValidNetworkMatrix(network,throwOnError))
@@ -92,7 +103,7 @@ RNRank = function(network, damping=0.85, max_iterations=100, threshold=0,
     s=unique(m[,1])
   }
 
-  # Συνολικά γονίδια που συμμετέχουν στα υποδίκτυα (είτε ρυθμίζοντα, είτε ρυθμιζόμενα)
+  # Συνολικά γονίδια που συμμετέχουν στο υποδίκτυο (είτε ρυθμίζοντα, είτε ρυθμιζόμενα)
   g=unique(c(m)) # ~ union(unique(m[,1]),unique(m[,2]))
   len_g=length(g)
   if (self)
@@ -143,6 +154,11 @@ RNRank = function(network, damping=0.85, max_iterations=100, threshold=0,
   if (!self)
     diag(H)=0
 
+  # Πριμοδοτήσεις (των FFL π.χ.)
+  if (!is.null(favored)) {
+    H=adjustTransitions(favored,H,1.1)
+  }
+
   # Αρχικοποίηση [1,0,0,....]
   I=matrix(data=0,nrow=len_g,ncol=1)
   rownames(I)=rownames(H)
@@ -179,4 +195,41 @@ RNRank = function(network, damping=0.85, max_iterations=100, threshold=0,
   if (sorted)
     I=I[order(I,decreasing = T),,drop=F]
   return(I)
+}
+
+adjustTransitions<-function(ffl,H,w=1)
+{
+  # Πίνακας με μία στήλη ή διάνυσμα: θα οδηγήσει σε πριμοδότηση κάθε σύνδεσης
+  # των στοιχείων (Η[C1,] και H[,C1])
+  # Πίνακας με δύο στήλες: θεωρώ ότι περιέχει κατευθυνόμενες ακμές
+  # Πριμοδοτούνται ακριβώς αυτές οι μεταβάσεις (Η[C2,C1])
+  # Πίνακας με τρεις ή παραπάνω στήλες: θεωρώ ότι στις 3 πρώτες στήλες περιέχει FFL,
+  # οπότε κάθε γραμμή του τη μετατρέπω σε 3 γραμμές 2 στηλών. Τελικά, θα πριμοδοτηθούν
+  # οι μεταβάσεις H[C2,C1], H[C3,C2] και H[C3,C1].
+  if (is.vector(ffl))
+    ffl=matrix(unique(ffl),ncol=1)
+  if (!is.matrix(ffl))
+    return(H)
+  nc=ncol(ffl)
+  if (nc<1)
+    return(H)
+  if (nc>=3) {
+    ffl=unique(rbind(ffl[,c(1,3)],ffl[,1:2],ffl[,2:3]))
+    nc=2
+  }
+
+  if (nc==2) {
+    for (r in seq_len(nrow(ffl))) {
+        s=ffl[r,1]
+        t=ffl[r,2]
+        H[t,s]=H[t,s]*w
+    }
+  } else if (nc==1) {
+    i=rownames(H) %in% ffl[,1]
+    H[i,i]=H[i,i]*w
+  }
+
+  # Κλιμάκωση των τιμών ώστε κάθε στήλη να δίνει άθροισμα 1
+  H=apply(H,2,function(x) x/sum(x))
+  return(H)
 }

@@ -30,6 +30,7 @@
 #' @param reference_dir Directory containing reference files for unsupported species
 #' @param ffl Locate and save Feed-Forward Loops by calling [RNFfl()]
 #' @param rank Call RNRank() on the resulting network and save an extra file with ranks
+#' @param favor If ranking, favor genes participating in FFLs
 #' @param ... Arguments to be passed to [RNRank()]
 #' @eval common_params()
 #'
@@ -40,7 +41,7 @@
 RNEAv3<-function(filename,identifier="GeneName",species,internal_data=T,
                  FC_threshold=1,PV_threshold=0.05,network="regulatory",
                  output_dir=".",output="Output",type_of_output="csv",
-                 reference_dir="ReferenceFiles",ffl=T,rank=T, ...,
+                 reference_dir="ReferenceFiles",ffl=T,rank=T,favor=T,...,
                  verbose=F, throwOnError=T){
 
   # Κώστας - Ο έλεγχος των παραμέτρων να γίνεται άμεσα
@@ -650,7 +651,7 @@ RNEAv3<-function(filename,identifier="GeneName",species,internal_data=T,
 	  write.csv(outffl,file=paste0(output,"_FFLs.csv"),quote = F,row.names = F)
 	}
 	if (rank) {
-	  P=RNRank(Network_final,...,verbose=verbose,throwOnError = throwOnError)
+	  P=RNRank(Network_final,...,favored = ifelse(favor & ffl,outffl,NULL),verbose=verbose,throwOnError = throwOnError)
 	  write.csv(P,file=paste0(output,"_Ranks.csv"),quote = F,row.names = T)
 	}
 	write.csv(Network_final,file=paste0(output,"_Network.csv"),quote=F,row.names=F);

@@ -18,6 +18,7 @@ RNEAv3(
   reference_dir = "ReferenceFiles",
   ffl = T,
   rank = T,
+  favor = T,
   ...,
   verbose = F,
   throwOnError = T
@@ -50,6 +51,8 @@ If any other, the relevant reference file must be provided in \code{reference_di
 \item{ffl}{Locate and save Feed-Forward Loops by calling \code{\link[=RNFfl]{RNFfl()}}}
 
 \item{rank}{Call RNRank() on the resulting network and save an extra file with ranks}
+
+\item{favor}{If ranking, favor genes participating in FFLs}
 
 \item{...}{Arguments to be passed to \code{\link[=RNRank]{RNRank()}}}
 

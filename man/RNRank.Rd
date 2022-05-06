@@ -9,11 +9,12 @@ RNRank(
   damping = 0.85,
   max_iterations = 100,
   threshold = 0,
-  self = F,
+  self = T,
   letZeros = F,
   divider = 100,
   sorted = T,
   preorder = F,
+  favored = NULL,
   verbose = F,
   throwOnError = T
 )
@@ -40,14 +41,27 @@ to use it for random regulations from regulating genes (minimum 10).}
 
 \item{preorder}{Sort input matrix, so that regulating genes with more targets are first.}
 
+\item{favored}{Regulations or genes, favored for better ranking. See 'Details'.}
+
 \item{verbose}{Shows some information during process.}
 
 \item{throwOnError}{If FALSE, in case of stopping error, returns NULL. Otherwise \code{\link[base:stop]{base::stop()}} is called.}
 }
 \value{
-Named 1-column matrix of percentages (0-1).
+Named 1-column matrix of probabilities (0-1).
 }
 \description{
 Infers importance of Regulatory Network nodes (genes),
 by using a Google's PageRank-like algorithm.
+}
+\details{
+\code{favored} contains gene names and is treated differently,
+depending on it being a vector or a matrix and if it is a matrix,
+depending on the number of columns. In any other case, it is ignored.
+\itemize{
+\item Vector or 1-column matrix: The regulations with any other gene are favored.
+\item 2 columns: Considered to contain directed edges. Exactly these regulations are favored.
+\item More columns: Considered to contain FFLs in the first three columns
+(as the matrix returned from \code{\link[=RNFfl]{RNFfl()}}). The regulations C1->C2, C1->C3 and C2->C3 are favored.
+}
 }
