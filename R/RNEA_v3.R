@@ -29,6 +29,7 @@
 #' @param type_of_output Type of output: (default) "csv" or "html"
 #' @param reference_dir Directory containing reference files for unsupported species
 #' @param ffl Locate and save Feed-Forward Loops by calling [RNFfl()]
+#' @param circles Locate and save circles by calling [RNCircle()]
 #' @param rank Call RNRank() on the resulting network and save an extra file with ranks
 #' @param favor If ranking, favor genes participating in FFLs
 #' @param ... Arguments to be passed to [RNRank()]
@@ -41,8 +42,8 @@
 RNEAv3<-function(filename,identifier="GeneName",species,internal_data=T,
                  FC_threshold=1,PV_threshold=0.05,network="regulatory",
                  output_dir=".",output="Output",type_of_output="csv",
-                 reference_dir="ReferenceFiles",ffl=T,rank=T,favor=T,...,
-                 verbose=F, throwOnError=T){
+                 reference_dir="ReferenceFiles",ffl=T,circles=T,rank=T,favor=T,
+                 ..., verbose=F, throwOnError=T){
 
   # Κώστας - Ο έλεγχος των παραμέτρων να γίνεται άμεσα
   if ((identifier %in% c("GeneName","Refseq"))==FALSE)
@@ -340,9 +341,10 @@ RNEAv3<-function(filename,identifier="GeneName",species,internal_data=T,
 	  miRNA_counts[z,5]=miRNA_counts[z,5]+length(dedown);
 	} # for (mir...
 
-	if (ffl) {
+	if (ffl)
 	  outffl=RNFfl(Network, verbose, throwOnError)
-	}
+	if (circles)
+	  outcircle=RNCircle(Network,verbose,throwOnError)
 
 	{
 	# for(Tf in 1:nrow(TF)){
@@ -649,6 +651,9 @@ RNEAv3<-function(filename,identifier="GeneName",species,internal_data=T,
 
 	if (ffl) {
 	  write.csv(outffl,file=paste0(output,"_FFLs.csv"),quote = F,row.names = F)
+	}
+	if (circles) {
+	  write.csv(outcircle,file=paste0(output,"_Circles.csv"),quote = F,row.names = F)
 	}
 	if (rank) {
 	  P=RNRank(Network_final,...,favored = ifelse(favor & ffl,outffl,NULL),verbose=verbose,throwOnError = throwOnError)

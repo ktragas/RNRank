@@ -16,6 +16,7 @@ common_params<-function() {
   )
 }
 
+# Δημιουργία πλήρους δικτύου από αρχείο reference
 makeNetFromReference<-function(species="Mouse",reference_dir="?")
 {
    if (reference_dir=="?") {
@@ -26,10 +27,59 @@ makeNetFromReference<-function(species="Mouse",reference_dir="?")
    rownames(TF)=TF[,2];
    Network=matrix(ncol=2,nrow=0)
    colnames(Network)=c("Source","Target");
-   Network=do.call("rbind", apply(TF,1,function(x) {
-     last_index=2+as.integer(x[1])
-     rbind(Network,cbind(x[2],x[3:last_index]))
-   }))
+   a=apply(TF,1,function(x) {
+      last_index=2+as.integer(x[1])
+      return(cbind(x[2],x[3:last_index]))
+   })
+   Network=do.call("rbind", a)
    rownames(Network)=NULL
    return(Network)
+}
+
+# Προσαρμογή μεταβάσεων σύμφωνα με το δίκτυο
+#
+# m: Ακμές ή γονίδια που θα πριμοδοτηθούν.
+#  Πίνακας με μία στήλη ή διάνυσμα: θα οδηγήσει σε πριμοδότηση κάθε σύνδεσης
+#  των στοιχείων (Η[C1,] και H[,C1])
+#  Πίνακας με δύο στήλες: θεωρώ ότι περιέχει κατευθυνόμενες ακμές
+#  Πριμοδοτούνται ακριβώς αυτές οι μεταβάσεις (Η[C2,C1])
+#  Πίνακας με τρεις ή παραπάνω στήλες: θεωρώ ότι στις 3 πρώτες στήλες περιέχει FFL,
+#  οπότε κάθε γραμμή του τη μετατρέπω σε 3 γραμμές 2 στηλών. Τελικά, θα πριμοδοτηθούν
+#  οι μεταβάσεις H[C2,C1], H[C3,C2] και H[C3,C1].
+# Η: Πίνακας πιθανοτήτων μετάβασης όπως έχει ετοιμαστεί από την RNRank()
+# w: Συντελεστής με τον οποίο πολλαπλασιάζονται τα κελιά που πρέπει
+#  >1 Πριμοδότηση, <1 Ποινή
+adjustTransitions<-function(m,H,w=1)
+{
+   if (is.vector(m))
+      m=matrix(unique(m),ncol=1)
+   if (!is.matrix(m))
+      return(H)
+   nc=ncol(m)
+   if (nc<1)
+      return(H)
+   if (nc>=3) {
+      m=unique(rbind(m[,c(1,3)],m[,1:2],m[,2:3]))
+      nc=2
+   }
+
+   if (nc==2) {
+      for (r in seq_len(nrow(m))) {
+         s=m[r,1]
+         t=m[r,2]
+         H[t,s]=H[t,s]*w
+      }
+   } else if (nc==1) {
+      i=which(rownames(H) %in% m[,1])
+      h=H[-i,-i] # Κρατάω τα στοιχεία που δεν πρέπει να αλλάξουν
+      H=H*w      # Πολλαπλασιάζω όλον τον πίνακα
+      H[-i,-i]=h # Επαναφέρω αυτά που κράτησα
+      # Αν το έκανα με κάποιον άλλον vectorized τρόπο κάποια στοιχεία
+      # θα πολλαπλασιάζονταν πάνω από μια φορά, ή κάποια δεν θα
+      # πολλαπλασιάζονταν ενώ έπρεπε
+   }
+
+   # Κλιμάκωση των τιμών ώστε κάθε στήλη να δίνει άθροισμα 1
+   H=apply(H,2,function(x) x/sum(x))
+   return(H)
 }

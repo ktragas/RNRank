@@ -1,7 +1,7 @@
 #' RNRank: A package for gene ranking in inferred active regulatory network
 #'
-#' The RNRank package provides five  functions:
-#' [RNEAv3()], [RNRank()], [RNFfl()], [produce_reference()] and [produce_reference_from_files()]
+#' The RNRank package provides six  functions:
+#' [RNEAv3()], [RNRank()], [RNFfl()], [RNCircle()], [produce_reference()] and [produce_reference_from_files()]
 #'
 #' @docType package
 #' @keywords internal
@@ -195,41 +195,4 @@ RNRank = function(network, damping=0.85, max_iterations=100, threshold=0,
   if (sorted)
     I=I[order(I,decreasing = T),,drop=F]
   return(I)
-}
-
-adjustTransitions<-function(ffl,H,w=1)
-{
-  # Πίνακας με μία στήλη ή διάνυσμα: θα οδηγήσει σε πριμοδότηση κάθε σύνδεσης
-  # των στοιχείων (Η[C1,] και H[,C1])
-  # Πίνακας με δύο στήλες: θεωρώ ότι περιέχει κατευθυνόμενες ακμές
-  # Πριμοδοτούνται ακριβώς αυτές οι μεταβάσεις (Η[C2,C1])
-  # Πίνακας με τρεις ή παραπάνω στήλες: θεωρώ ότι στις 3 πρώτες στήλες περιέχει FFL,
-  # οπότε κάθε γραμμή του τη μετατρέπω σε 3 γραμμές 2 στηλών. Τελικά, θα πριμοδοτηθούν
-  # οι μεταβάσεις H[C2,C1], H[C3,C2] και H[C3,C1].
-  if (is.vector(ffl))
-    ffl=matrix(unique(ffl),ncol=1)
-  if (!is.matrix(ffl))
-    return(H)
-  nc=ncol(ffl)
-  if (nc<1)
-    return(H)
-  if (nc>=3) {
-    ffl=unique(rbind(ffl[,c(1,3)],ffl[,1:2],ffl[,2:3]))
-    nc=2
-  }
-
-  if (nc==2) {
-    for (r in seq_len(nrow(ffl))) {
-        s=ffl[r,1]
-        t=ffl[r,2]
-        H[t,s]=H[t,s]*w
-    }
-  } else if (nc==1) {
-    i=rownames(H) %in% ffl[,1]
-    H[i,i]=H[i,i]*w
-  }
-
-  # Κλιμάκωση των τιμών ώστε κάθε στήλη να δίνει άθροισμα 1
-  H=apply(H,2,function(x) x/sum(x))
-  return(H)
 }

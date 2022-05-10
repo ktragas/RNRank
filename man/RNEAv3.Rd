@@ -17,6 +17,7 @@ RNEAv3(
   type_of_output = "csv",
   reference_dir = "ReferenceFiles",
   ffl = T,
+  circles = T,
   rank = T,
   favor = T,
   ...,
@@ -49,6 +50,8 @@ If any other, the relevant reference file must be provided in \code{reference_di
 \item{reference_dir}{Directory containing reference files for unsupported species}
 
 \item{ffl}{Locate and save Feed-Forward Loops by calling \code{\link[=RNFfl]{RNFfl()}}}
+
+\item{circles}{Locate and save circles by calling \code{\link[=RNCircle]{RNCircle()}}}
 
 \item{rank}{Call RNRank() on the resulting network and save an extra file with ranks}
 

@@ -15,6 +15,7 @@ RNRank(
   sorted = T,
   preorder = F,
   favored = NULL,
+  favoring = 1.1,
   verbose = F,
   throwOnError = T
 )
@@ -22,7 +23,7 @@ RNRank(
 \arguments{
 \item{network}{Two-column gene matrix. Every row contains one regulating and one regulated gene.}
 
-\item{damping}{Damping factor (0-1) defining percentage of non-randomness.}
+\item{damping}{Damping factor (0-1) defining probability of non-randomness.}
 
 \item{max_iterations}{Maximum number of iterations, if not converging earlier (minimum 10).}
 
@@ -34,14 +35,16 @@ will terminate calculations}
 \item{letZeros}{Set to \code{FALSE} to allow random regulations from regulating genes
 to those not normally regulated.}
 
-\item{divider}{Divides the percentage used for dangling genes,
+\item{divider}{Divides the probability used for dangling genes,
 to use it for random regulations from regulating genes (minimum 10).}
 
-\item{sorted}{Results sorted by descending percentage (T) or unsorted (F).}
+\item{sorted}{Results sorted by descending probability (T) or unsorted (F).}
 
 \item{preorder}{Sort input matrix, so that regulating genes with more targets are first.}
 
 \item{favored}{Regulations or genes, favored for better ranking. See 'Details'.}
+
+\item{favoring}{Multiplier of favored regulations.}
 
 \item{verbose}{Shows some information during process.}
 

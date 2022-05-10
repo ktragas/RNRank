@@ -52,11 +52,10 @@ produce_reference<-function(t,tf,biomart,org_id="",thresholdCols=c(8,10),thresho
     tmpc=c()
     tmpt=c()
     for (i in 1:lc) {
-      if (thresholdCols[i]>2 && thresholdCols[i]<=nc) { # Οι πρώτες 2 στήλες είναι πάντα οι πρωτεΐνες
-        tmpc=c(tmpc,thresholdCols[i])
-        tmp=as.numeric(thresholds[i])
-        tmpt=c(tmpt,ifelse(is.numeric(tmp),tmp,-Inf))
-      }
+      if (thresholdCols[i]<=2 || thresholdCols[i]>nc) next  # Οι πρώτες 2 στήλες είναι πάντα οι πρωτεΐνες
+      tmpc=c(tmpc,thresholdCols[i])
+      tmp=as.numeric(thresholds[i])
+      tmpt=c(tmpt,ifelse(is.numeric(tmp),tmp,-Inf))
     }
     thresholdCols=tmpc
     thresholds=tmpt
