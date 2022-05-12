@@ -8,7 +8,8 @@ produce_reference_from_files(
   pi_file,
   tf_file,
   tf_column,
-  bm_file,
+  pg_file,
+  pg_format = c("Normal", "STRING"),
   out_file,
   headers = rep(T, 3),
   seps = rep("", 3),
@@ -22,7 +23,11 @@ produce_reference_from_files(
 
 \item{tf_column}{Column containing gene name of TFs}
 
-\item{bm_file}{Protein-gene matching from Biomart (N:1)}
+\item{pg_file}{Protein-gene matching (from Biomart or STRING, N:1)}
+
+\item{pg_format}{If STRING it is assumed that the protein column
+may have the form \emph{<org_id>.<protein>}. In this case, it will be stripped
+before passed to \code{\link[=produce_reference]{produce_reference()}}}
 
 \item{out_file}{Results will be saved to this tab-separated file}
 

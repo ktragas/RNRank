@@ -111,7 +111,7 @@ RNFct<-function(network,func=c("ffl","circle"),verbose=F,throwOnError=T)
 
       for (z in possibleZ) {
         # Από τα ρυθμιζόμενα από το x, όσα ρυθμίζουν το z, είναι y
-        y=network[network[,1] %in% possibleY & network[,2]==z, 1]
+        y=network[network[,2]==z & network[,1] %in% possibleY, 1]
         if (length(y)<=0) next
 
         # Βρέθηκαν!

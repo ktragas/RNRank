@@ -12,7 +12,8 @@ produce_reference(
   thresholdCols = c(8, 10),
   thresholds = c(),
   thresholdMethod = c("and", "or"),
-  as.data.frame = F
+  as.data.frame = F,
+  verbose = T
 )
 }
 \arguments{
@@ -34,6 +35,8 @@ Only greater values than the threshold are accepted.}
 \item{thresholdMethod}{The method to be used for threshold checking. See 'Details'.}
 
 \item{as.data.frame}{Return data frame instead of list}
+
+\item{verbose}{Print stats during processing}
 }
 \value{
 List or data frame containing the TF interactions. NULL in case of error.

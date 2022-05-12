@@ -18,6 +18,7 @@
 #' Only greater values than the threshold are accepted.
 #' @param thresholdMethod The method to be used for threshold checking. See 'Details'.
 #' @param as.data.frame Return data frame instead of list
+#' @param verbose Print stats during processing
 #'
 #' @return List or data frame containing the TF interactions. NULL in case of error.
 #' Format is: Count of interactions, TF, Interactors
@@ -25,18 +26,26 @@
 #'
 #' @examples
 produce_reference<-function(t,tf,biomart,org_id="",thresholdCols=c(8,10),thresholds=c(),
-                            thresholdMethod=c("and","or"),as.data.frame=F)
+                            thresholdMethod=c("and","or"),as.data.frame=F,verbose=T)
 {
   # Έλεγχος παραμέτρων
   nc=ncol(t)
   if (!is.numeric(nc) || nc<2) return(NULL)
+  pi_len=nrow(t)
+  if (verbose){
+    print(sprintf("%d total protein interactions",pi_len))
+  }
 
   tf=as.vector(tf)
   if (!is.vector(tf)) return(NULL)
   # Διαπίστωσα ότι στο ποντίκι είχε διπλές εγγραφές
   tf=unique(trimws(tf))
   tf=tf[nchar(tf)>0]
-  if (length(tf)<=0) return(NULL)
+  tf_len=length(tf)
+  if (verbose) {
+     print(sprintf("%d TFs",tf_len))
+  }
+  if (tf_len<=0) return(NULL)
 
   org_id=as.character(org_id)
   if (!is.character(org_id) || length(org_id)!=1)
@@ -62,9 +71,15 @@ produce_reference<-function(t,tf,biomart,org_id="",thresholdCols=c(8,10),thresho
   }
 
   # Αφαιρώ γραμμές χωρίς protein id και γραμμές χωρίς gene name
+  bm_orglen=nrow(biomart) # Αρχικός αριθμός εγγραφών
   w=which(biomart[,1]=="" | biomart[,2]=="")
   if (length(w)>0)
     biomart=biomart[-w,]
+  bm_len=nrow(biomart) # Τελικός αριθμός εγγραφών
+  if (verbose) {
+    print(sprintf("Keeping %d (out of %d) protein-gene matching records",bm_len,bm_orglen))
+  }
+
   # Μετατρέπω σε named vectors, με κωδικό οργανισμού, για πιο εύκολες αναζητήσεις
   # Προϋπόθεση να μην αντιστοιχεί μία πρωτεΐνη σε πάνω από ένα γονίδιο.
   bm_id=biomart[,2]
@@ -83,6 +98,10 @@ produce_reference<-function(t,tf,biomart,org_id="",thresholdCols=c(8,10),thresho
     checkCol=3
   }
   t=t[(t[,1] %in% tf_bm[,checkCol] | t[,2] %in% tf_bm[,checkCol]),]
+  pi_len=nrow(t)
+  if (verbose){
+    print(sprintf("%d TF protein interactions before filtering",pi_len))
+  }
 
   # Για να λιγοστέψουν τα δεδομένα στη μνήμη, κρατώ μόνο τις στήλες που με ενδιαφέρουν,
   # δηλ. τις πρωτεΐνες και τις thresholdCols
@@ -112,7 +131,10 @@ produce_reference<-function(t,tf,biomart,org_id="",thresholdCols=c(8,10),thresho
       t=tsel
   }
   rm(t1)
-
+  pi_len=nrow(t)
+  if (verbose){
+    print(sprintf("%d TF protein interactions after filtering",pi_len))
+  }
   # Για κάθε μεταγραφικό παράγοντα, βρίσκω τις συνδέσεις του και φτιάχνω μια λίστα
   # που αντιστοιχεί σε μία εγγραφή του αρχείου Reference. Η λίστα ref κρατάει όλες
   # αυτές τις λίστες.
@@ -144,6 +166,11 @@ produce_reference<-function(t,tf,biomart,org_id="",thresholdCols=c(8,10),thresho
   # Ταξινόμηση κατά πλήθος ρυθμιζόμενων
   lengths=sapply(ref,"[[",1) # ή sapply(ref,"[[","count")
   ref=ref[order(lengths,decreasing = T)]
+
+  if (verbose) {
+     print(sprintf("%d Reference records with %d maximum single TF interactions",
+                 length(ref), ref[[1]]$count))
+  }
 
   # Μετατροπή σε data.frame
   if (as.data.frame==T) {

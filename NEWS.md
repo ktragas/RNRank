@@ -1,3 +1,8 @@
+# RNRank 0.2.4.9001
+
+* Support for STRING protein-gene matching
+* Recreation of reference files with more BioMart data
+
 # RNRank 0.2.4.9000
 
 * Locate circles in regulatory network

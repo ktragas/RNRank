@@ -17,12 +17,12 @@ common_params<-function() {
 }
 
 # Δημιουργία πλήρους δικτύου από αρχείο reference
-makeNetFromReference<-function(species="Mouse",reference_dir="?")
+makeNetFromReference<-function(species="Mouse",suffix="_TF_Reference.tsv",reference_dir="?",verbose=T)
 {
    if (reference_dir=="?") {
      reference_dir=system.file("extdata","ReferenceFiles",package="RNRank")
    }
-   TF_ref=file.path(reference_dir,paste0(species,"_TF_Reference.tsv"));
+   TF_ref=file.path(reference_dir,paste0(species,suffix));
    TF=read.table(TF_ref,sep="\t",fill=T);
    rownames(TF)=TF[,2];
    Network=matrix(ncol=2,nrow=0)
@@ -33,6 +33,15 @@ makeNetFromReference<-function(species="Mouse",reference_dir="?")
    })
    Network=do.call("rbind", a)
    rownames(Network)=NULL
+   if (verbose) {
+      ng=length(unique(c(Network)))
+      nr=nrow(Network)
+      if (nr>0)
+        msg=sprintf("Network consists of %d genes and contains %d edges",ng,nr)
+      else
+        msg="Empty network"
+      print(msg)
+   }
    return(Network)
 }
 
@@ -43,13 +52,16 @@ makeNetFromReference<-function(species="Mouse",reference_dir="?")
 #  των στοιχείων (Η[C1,] και H[,C1])
 #  Πίνακας με δύο στήλες: θεωρώ ότι περιέχει κατευθυνόμενες ακμές
 #  Πριμοδοτούνται ακριβώς αυτές οι μεταβάσεις (Η[C2,C1])
-#  Πίνακας με τρεις ή παραπάνω στήλες: θεωρώ ότι στις 3 πρώτες στήλες περιέχει FFL,
-#  οπότε κάθε γραμμή του τη μετατρέπω σε 3 γραμμές 2 στηλών. Τελικά, θα πριμοδοτηθούν
-#  οι μεταβάσεις H[C2,C1], H[C3,C2] και H[C3,C1].
-# Η: Πίνακας πιθανοτήτων μετάβασης όπως έχει ετοιμαστεί από την RNRank()
+#  Πίνακας με τρεις ή παραπάνω στήλες: Κάθε γραμμή του τη μετατρέπω σε 3 γραμμές
+#  2 στηλών, δηλαδή στις αντίστοιχες ακμές. Aν η παράμετρος func ορίζει ότι στις 3
+#  πρώτες στήλες περιέχει FFL, τελικά θα πριμοδοτηθούν οι μεταβάσεις H[C2,C1],
+#  H[C3,C2] και H[C3,C1]. Αν περιέχει κύκλους, τότε θα πριμοδοτηθούν οι μεταβάσεις
+#  H[C2,C1], H[C3,C2] και H[C1,C3].
+# Η: Πίνακας πιθανοτήτων μετάβασης όπως έχει ετοιμαστεί από την RNRank().
 # w: Συντελεστής με τον οποίο πολλαπλασιάζονται τα κελιά που πρέπει
 #  >1 Πριμοδότηση, <1 Ποινή
-adjustTransitions<-function(m,H,w=1)
+# func: Καθορίζει αν ο πίνακας m τριών στηλών και άνω αναπαριστά FFL ή κύκλο
+adjustTransitions<-function(m,H,w=1,func=c("ffl","circle"))
 {
    if (is.vector(m))
       m=matrix(unique(m),ncol=1)
@@ -59,7 +71,11 @@ adjustTransitions<-function(m,H,w=1)
    if (nc<1)
       return(H)
    if (nc>=3) {
-      m=unique(rbind(m[,c(1,3)],m[,1:2],m[,2:3]))
+      func=match.arg(func)
+      if (func=="ffl")
+         m=unique(rbind(m[,c(1,2)],m[,c(1,3)],m[,2:3]))
+      else #circle
+         m=unique(rbind(m[,c(1,2)],m[,c(2:3)],m[,3:1]))
       nc=2
    }
 
