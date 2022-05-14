@@ -34,12 +34,12 @@ test_that("RNRank works", {
     ffl=as.matrix(read.table(FFL_file,header=T,sep=","))
     Circle_file=file.path(OutputPath,paste0(name,"_Circles.csv"))
     circles=as.matrix(read.table(Circle_file,header=T,sep=","))
-    P=RNRank(srcm, max_iterations = 200, threshold=0.001, damping=0.85,
+    l=RNRank(srcm, max_iterations = 200, threshold=0.001, damping=0.85,
              self=T, letZeros = T, divider = 1000.0,
              favoredFFLs=ffl,favoredCircles=circles,favorings=c(1.15,1.1),
-             verbose = T)
+             returned="both",verbose = T)
+    P=l$values
     print(head(P,10))
-    title=sprintf("%s - Most important genes", name)
     # barplot(P[1:min(length(P),30),1],las=2,main=title)
     barplot(P[min(length(P),20):1,1],las=2,main=title,horiz=T,
             cex.names=0.8,width=10,space=0.4)

@@ -42,15 +42,21 @@
 #' @param favoredCircles Regulations or genes, favored for better ranking. See 'Details'.
 #' @param favorings Multiplier of favored regulations. Single value or numeric vector.
 #' In case of vector, first value is for `favoredFFLs` and second for `favoredCircles`.
+#' @param returned Function can return values, ranks or both.
+#' @param ties.method	a character string specifying how ties are treated. See [base::rank()].
 #' @eval common_params()
 #'
-#' @return Named 1-column matrix of probabilities (0-1).
+#' @return If `returned` is "`values`", a named 1-column matrix of probabilities (0-1) is returned.
+#' If `returned` is "`ranks`", a named 1-column matrix of ranks (highest value->first ranking) is returned.
+#' If `returned` is "`both`", a list containing the two matrices is returned.
 #' @export
 #'
 #' @examples
 RNRank = function(network, damping=0.85, max_iterations=100, threshold=0,
                   self=T, letZeros=F, divider=100.0, sorted=T, preorder=F,
-                  favoredFFLs=NULL, favoredCircles=NULL, favorings=1.1, verbose=F, throwOnError=T)
+                  favoredFFLs=NULL, favoredCircles=NULL, favorings=1.1,
+                  returned=c("values","ranks","both"),
+                  ties.method = "min", verbose=F, throwOnError=T)
 {
   # Έλεγχος παραμέτρων
   if (!isValidNetworkMatrix(network,throwOnError))
@@ -163,11 +169,17 @@ RNRank = function(network, damping=0.85, max_iterations=100, threshold=0,
   if (is.numeric(favorings)) {
     if (length(favorings)==1)
        favorings=rep(favorings,2)
-    if (!is.null(favoredFFLs)) {
-      H=adjustTransitions(favoredFFLs,H,favorings[1],"ffl")
-    }
-    if (!is.null(favoredCircles)) {
-      H=adjustTransitions(favoredCircles,H,favorings[2],"circle")
+    for (i in 1:2) {
+       if (favorings[i]<=0 || favorings[i]==1) next
+       if (i==1) {
+          f=favoredFFLs
+          what="ffl"
+       } else {
+          f=favoredCircles
+          what="circle"
+       }
+       if (!is.null(f))
+          H=adjustTransitions(f,H,favorings[i],what)
     }
   }
 
@@ -206,5 +218,15 @@ RNRank = function(network, damping=0.85, max_iterations=100, threshold=0,
     print(sprintf("Finished in %d iterations",i))
   if (sorted)
     I=I[order(I,decreasing = T),,drop=F]
-  return(I)
+
+  returned=match.arg(returned)
+  if (returned!="values")
+    R=rank(-I,ties.method = ties.method)
+
+  if (returned=="ranks") {
+    return(R)
+  } else if (returned=="both") {
+    return(list(values=I,ranks=R))
+  } else # "values"
+    return(I)
 }

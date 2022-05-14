@@ -1,6 +1,7 @@
 # RNRank 0.2.4.9002
 
 * Favoring of circles added
+* Return options added to RNRank()
 
 # RNRank 0.2.4.9001
 
