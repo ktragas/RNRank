@@ -14,14 +14,17 @@
 #' @description Infers importance of Regulatory Network nodes (genes),
 #' by using a Google's PageRank-like algorithm.
 #'
-#' @details `favored` contains gene names and is treated differently,
-#' depending on it being a vector or a matrix and if it is a matrix,
-#' depending on the number of columns. In any other case, it is ignored.
+#' @details `favoredFFLs` and `favoredCircles` contain gene names and are treated
+#' differently, depending on them being vectors or matrices and if any of them
+#' is a matrix, depending on the number of columns. In any other case, they are ignored.
 #'
 #' * Vector or 1-column matrix: The regulations with any other gene are favored.
 #' * 2 columns: Considered to contain directed edges. Exactly these regulations are favored.
-#' * More columns: Considered to contain FFLs in the first three columns
-#'  (as the matrix returned from [RNFfl()]). The regulations C1->C2, C1->C3 and C2->C3 are favored.
+#' * More columns: `favoredFFLs` is considered to contain FFLs in the first three columns
+#'  (as the matrix returned from [RNFfl()]). The regulations C1->C2, C1->C3 and
+#'  C2->C3 are favored. `favoredCircles` is considered to contain circles in the
+#'  first three columns (as the matrix returned from [RNCircle()]).
+#'  The regulations C1->C2, C2->C3 and C3->C1 are favored.
 #'
 #' @eval net_param()
 #' @param max_iterations Maximum number of iterations, if not converging earlier (minimum 10).
@@ -35,8 +38,10 @@
 #' to use it for random regulations from regulating genes (minimum 10).
 #' @param sorted Results sorted by descending probability (T) or unsorted (F).
 #' @param preorder Sort input matrix, so that regulating genes with more targets are first.
-#' @param favored Regulations or genes, favored for better ranking. See 'Details'.
-#' @param favoring Multiplier of favored regulations.
+#' @param favoredFFLs Regulations or genes, favored for better ranking. See 'Details'.
+#' @param favoredCircles Regulations or genes, favored for better ranking. See 'Details'.
+#' @param favorings Multiplier of favored regulations. Single value or numeric vector.
+#' In case of vector, first value is for `favoredFFLs` and second for `favoredCircles`.
 #' @eval common_params()
 #'
 #' @return Named 1-column matrix of probabilities (0-1).
@@ -45,7 +50,7 @@
 #' @examples
 RNRank = function(network, damping=0.85, max_iterations=100, threshold=0,
                   self=T, letZeros=F, divider=100.0, sorted=T, preorder=F,
-                  favored=NULL, favoring=1.1, verbose=F, throwOnError=T)
+                  favoredFFLs=NULL, favoredCircles=NULL, favorings=1.1, verbose=F, throwOnError=T)
 {
   # Έλεγχος παραμέτρων
   if (!isValidNetworkMatrix(network,throwOnError))
@@ -154,9 +159,16 @@ RNRank = function(network, damping=0.85, max_iterations=100, threshold=0,
   if (!self)
     diag(H)=0
 
-  # Πριμοδοτήσεις (των FFL π.χ.)
-  if (!is.null(favored)) {
-    H=adjustTransitions(favored,H,1.1)
+  # Πριμοδοτήσεις (των FFL και των κύκλων π.χ.)
+  if (is.numeric(favorings)) {
+    if (length(favorings)==1)
+       favorings=rep(favorings,2)
+    if (!is.null(favoredFFLs)) {
+      H=adjustTransitions(favoredFFLs,H,favorings[1],"ffl")
+    }
+    if (!is.null(favoredCircles)) {
+      H=adjustTransitions(favoredCircles,H,favorings[2],"circle")
+    }
   }
 
   # Αρχικοποίηση [1,0,0,....]

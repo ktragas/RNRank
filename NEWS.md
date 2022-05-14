@@ -1,3 +1,7 @@
+# RNRank 0.2.4.9002
+
+* Favoring of circles added
+
 # RNRank 0.2.4.9001
 
 * Support for STRING protein-gene matching

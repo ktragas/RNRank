@@ -73,9 +73,9 @@ adjustTransitions<-function(m,H,w=1,func=c("ffl","circle"))
    if (nc>=3) {
       func=match.arg(func)
       if (func=="ffl")
-         m=unique(rbind(m[,c(1,2)],m[,c(1,3)],m[,2:3]))
+         m=unique(rbind(m[,1:2],m[,c(1,3)],m[,2:3]))
       else #circle
-         m=unique(rbind(m[,c(1,2)],m[,c(2:3)],m[,3:1]))
+         m=unique(rbind(m[,1:2],m[,2:3],m[,c(3,1)]))
       nc=2
    }
 

@@ -14,8 +14,9 @@ RNRank(
   divider = 100,
   sorted = T,
   preorder = F,
-  favored = NULL,
-  favoring = 1.1,
+  favoredFFLs = NULL,
+  favoredCircles = NULL,
+  favorings = 1.1,
   verbose = F,
   throwOnError = T
 )
@@ -42,9 +43,12 @@ to use it for random regulations from regulating genes (minimum 10).}
 
 \item{preorder}{Sort input matrix, so that regulating genes with more targets are first.}
 
-\item{favored}{Regulations or genes, favored for better ranking. See 'Details'.}
+\item{favoredFFLs}{Regulations or genes, favored for better ranking. See 'Details'.}
 
-\item{favoring}{Multiplier of favored regulations.}
+\item{favoredCircles}{Regulations or genes, favored for better ranking. See 'Details'.}
+
+\item{favorings}{Multiplier of favored regulations. Single value or numeric vector.
+In case of vector, first value is for \code{favoredFFLs} and second for \code{favoredCircles}.}
 
 \item{verbose}{Shows some information during process.}
 
@@ -58,13 +62,16 @@ Infers importance of Regulatory Network nodes (genes),
 by using a Google's PageRank-like algorithm.
 }
 \details{
-\code{favored} contains gene names and is treated differently,
-depending on it being a vector or a matrix and if it is a matrix,
-depending on the number of columns. In any other case, it is ignored.
+\code{favoredFFLs} and \code{favoredCircles} contain gene names and are treated
+differently, depending on them being vectors or matrices and if any of them
+is a matrix, depending on the number of columns. In any other case, they are ignored.
 \itemize{
 \item Vector or 1-column matrix: The regulations with any other gene are favored.
 \item 2 columns: Considered to contain directed edges. Exactly these regulations are favored.
-\item More columns: Considered to contain FFLs in the first three columns
-(as the matrix returned from \code{\link[=RNFfl]{RNFfl()}}). The regulations C1->C2, C1->C3 and C2->C3 are favored.
+\item More columns: \code{favoredFFLs} is considered to contain FFLs in the first three columns
+(as the matrix returned from \code{\link[=RNFfl]{RNFfl()}}). The regulations C1->C2, C1->C3 and
+C2->C3 are favored. \code{favoredCircles} is considered to contain circles in the
+first three columns (as the matrix returned from \code{\link[=RNCircle]{RNCircle()}}).
+The regulations C1->C2, C2->C3 and C3->C1 are favored.
 }
 }

@@ -25,15 +25,18 @@ test_that("RNRank works", {
   expect_output({
     OutputPath=file.path(rprojroot::find_root(rprojroot::has_dir("tests")),"Output")
     name=#"gene_exp_out"
-         #"GSE63889"
-         "GSE182432"
+         "GSE63889"
+         #"GSE182432"
+    title=sprintf("%s - Most important genes", name)
     RNEA_output_file=file.path(OutputPath,paste0(name,"_Network.csv"))
     srcm=as.matrix(read.table(RNEA_output_file,header=T,sep=","))
     FFL_file=file.path(OutputPath,paste0(name,"_FFLs.csv"))
     ffl=as.matrix(read.table(FFL_file,header=T,sep=","))
+    Circle_file=file.path(OutputPath,paste0(name,"_Circles.csv"))
+    circles=as.matrix(read.table(Circle_file,header=T,sep=","))
     P=RNRank(srcm, max_iterations = 200, threshold=0.001, damping=0.85,
              self=T, letZeros = T, divider = 1000.0,
-             favored=ffl, favoring=1.15,
+             favoredFFLs=ffl,favoredCircles=circles,favorings=c(1.15,1.1),
              verbose = T)
     print(head(P,10))
     title=sprintf("%s - Most important genes", name)

@@ -1,6 +1,6 @@
 Package: RNRank
 Title: Gene Ranking In Inferred Active Regulatory Network
-Version: 0.2.4.9001
+Version: 0.2.4.9002
 Authors@R: 
     person("Konstantinos", "Tragkas", , "std507586@ac.eap.gr", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0001-6181-8904"))
@@ -10,7 +10,7 @@ Description: Infers active regulatory networks from gene expression data
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.0
 Suggests: 
     knitr,
     rmarkdown,
