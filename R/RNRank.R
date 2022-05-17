@@ -104,7 +104,7 @@ RNRank = function(network, damping=0.85, max_iterations=100, threshold=0,
     s=names(sort(table(m[,1]),decreasing = T))
 
     for (i in seq_along(s)) {
-      m1=rbind(m1,m[which(m[,1]==s[i]),])
+      m1=rbind(m1,m[m[,1]==s[i],])
     }
     m=m1
     rm(m1)
@@ -146,7 +146,7 @@ RNRank = function(network, damping=0.85, max_iterations=100, threshold=0,
   # παράμετροι letZeros, divider
   used_perc=0
   for (cur in s) {
-    cur_targets=m[which(m[,1]==cur),2]
+    cur_targets=m[m[,1]==cur,2]
     if (!letZeros) {
         non_targets=setdiff(g,cur_targets)
         if (!self)

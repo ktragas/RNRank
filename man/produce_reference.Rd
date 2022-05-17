@@ -26,7 +26,7 @@ produce_reference(
 \item{org_id}{STRING organism ID. If specified, it is assumed that protein names
 in the interactions table will have the form \emph{<org_id>.<protein>}.}
 
-\item{thresholdCols}{Column numbers in protein interactions dataset,
+\item{thresholdCols}{Column indices in protein interactions dataset,
 to be checked against thresholds}
 
 \item{thresholds}{Respective thresholds for thresholdCols.

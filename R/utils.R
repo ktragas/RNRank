@@ -99,3 +99,7 @@ adjustTransitions<-function(m,H,w=1,func=c("ffl","circle"))
    H=apply(H,2,function(x) x/sum(x))
    return(H)
 }
+
+# Hack για να επιστρέφεται και NULL χωρίς λάθος
+if_else<-function(s,a,b) switch((s)+1,b,a)
+

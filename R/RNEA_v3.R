@@ -116,6 +116,7 @@ RNEAv3<-function(filename,identifier="GeneName",species,internal_data=T,
    	gos=read.table(GOs_ref,sep="\t",fill=T);
    	rownames(gos)=gos[,2];
   }
+  TF_genes=TF[,2]
 
 	Input=read.table(filename,sep="\t",header=T);
 	ncolInput=ncol(Input);
@@ -273,48 +274,53 @@ RNEAv3<-function(filename,identifier="GeneName",species,internal_data=T,
 	Number_of_DE_genes=length(DE_genes);
 	Number_of_Up_genes=length(UP_genes);
 	Number_of_Down_genes=length(DOWN_genes);
-	print(paste(Number_of_DE_genes,"differentially expressed genes"));
-	print(paste(Number_of_Up_genes,"upregulated"));
-	print(paste(Number_of_Down_genes,"downregulated"));
+	if (verbose) {
+  	print(paste(Number_of_DE_genes,"differentially expressed genes"));
+  	print(paste(Number_of_Up_genes,"upregulated"));
+  	print(paste(Number_of_Down_genes,"downregulated"));
+	}
 
 	# Kώστας (start)
 	Genes=list(up=UP_genes,down=DOWN_genes)
 	IsDE=list(up=1,down=-1)
+	if (verbose) count=0
 	for (direction in c("up","down")) {
 	  # zar : Διαφορικά εκφρασμένα ρυθμιστικά γονίδια
 	  # (δηλ. που βρίσκονται στη στήλη 2 των αρχείων reference)
-	  zar = intersect(TF[ ,2], Genes[[direction]])
+	  zar = intersect(TF_genes, Genes[[direction]])
     for (z in zar) { # z : parent (=1ου επιπέδου) γονίδιο
+      if (verbose) {
+        count=count+1
+        cat(sprintf("[%d] %s\r",count,stringr::str_pad(z,15,"right")))
+      }
       # Κάθε εγγραφή περιέχει διαφορετικό πλήθος ρυθμιζόμενων γονιδίων,
       # που καθορίζεται στη στήλη 1 των αρχείων reference
       # και βρίσκονται από την στήλη 3 και πέρα
       last_index = 2 + TF[z, 1]
-      regulated_genes = as.matrix(TF[z, 3:last_index])
+      regulated_genes = TF[z, 3:last_index]
       deup = intersect(regulated_genes, UP_genes)
       dedown = intersect(regulated_genes, DOWN_genes)
       deup_len = length(deup)
       dedown_len = length(dedown)
       if (needRegulatory) {
         # Parent - children
-        if (deup_len > 0)
-          Network = rbind(Network, cbind(z, deup))
-        if (dedown_len > 0)
-          Network = rbind(Network, cbind(z, dedown))
+        Network = rbind(Network,
+                    if_else(deup_len>0,cbind(z,deup),NULL),
+                    if_else(dedown_len>0,cbind(z,dedown),NULL))
       }
       TF_counts[z, 3] = IsDE[[direction]]
       TF_counts[z, 4] = TF_counts[z, 4] + deup_len + dedown_len
       TF_counts[z, 5] = TF_counts[z, 5] + deup_len
       TF_counts[z, 6] = TF_counts[z, 6] + dedown_len
 
-      #Για κάθε ρυθμιζόμενο γονίδιο
-      for (tidx in 3:last_index) {
-        gene = TF[z, tidx]
-        if (length(intersect(gene, rownames(TF))) <= 0) next
+      child_TFs=intersect(TF[z,3:last_index],TF_genes)
+      # child_TF_indices=match(child_TFs,TF[z,3:last_index])+2
 
-        # αν ρυθμίζει κι αυτό κάποια γονίδια (είναι δηλαδή TF)
+      #Για κάθε ρυθμιζόμενο γονίδιο που ρυθμίζει κι αυτό κάποια γονίδια (είναι δηλαδή TF)
+      for (gene in child_TFs) {
         inner_last_index=2 + TF[gene, 1]
-        deup = intersect(as.matrix(TF[gene, 3:inner_last_index]), UP_genes)
-        dedown = intersect(as.matrix(TF[gene, 3:inner_last_index]), DOWN_genes)
+        deup = intersect(TF[gene, 3:inner_last_index], UP_genes)
+        dedown = intersect(TF[gene, 3:inner_last_index], DOWN_genes)
         deup_len = length(deup)
         dedown_len = length(dedown)
         if (needRegulatory) {
@@ -323,27 +329,24 @@ RNEAv3<-function(filename,identifier="GeneName",species,internal_data=T,
           # στο προηγούμενο στάδιο, αλλά είναι πιο εύκολο να αφαιρεθεί
           # η διπλή εγγραφή με unique() στο τέλος, από το να γίνονται
           # έλεγχοι εδώ
-          if (deup_len > 0) {
-            Network = rbind(Network, c(z, gene))
-            Network = rbind(Network, cbind(gene, deup))
-          }
-          if (dedown_len > 0) {
-            Network = rbind(Network, c(z, gene))
-            Network = rbind(Network, cbind(gene, dedown))
+          if (deup_len > 0 || dedown_len > 0) {
+            Network = rbind(Network, c(z,gene),
+              if_else(deup_len>0,cbind(gene,deup),NULL),
+              if_else(dedown_len>0,cbind(gene,dedown),NULL))
           }
         }
         TF_counts[z, 1] = TF_counts[z, 1] + TF[gene, 1]
         TF_counts[z, 4] = TF_counts[z, 4] + deup_len + dedown_len
         TF_counts[z, 5] = TF_counts[z, 5] + deup_len
         TF_counts[z, 6] = TF_counts[z, 6] + dedown_len
-      } # for (tidx...
+      } # for (gene...
     } # for (z...
 	} # for (direction...
 
 	for(mir in seq_len(nrow(miRNA))){
 	  z=rownames(miRNA)[mir];
 	  last_index=2+miRNA[z,1];
-	  regulated_genes=as.matrix(miRNA[z,3:last_index])
+	  regulated_genes=miRNA[z,3:last_index]
 	  deup=intersect(regulated_genes,UP_genes);
 	  dedown=intersect(regulated_genes,DOWN_genes);
 	  de=intersect(regulated_genes,DE_genes);

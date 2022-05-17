@@ -17,6 +17,8 @@ RNRank(
   favoredFFLs = NULL,
   favoredCircles = NULL,
   favorings = 1.1,
+  returned = c("values", "ranks", "both"),
+  ties.method = "min",
   verbose = F,
   throwOnError = T
 )
@@ -50,12 +52,18 @@ to use it for random regulations from regulating genes (minimum 10).}
 \item{favorings}{Multiplier of favored regulations. Single value or numeric vector.
 In case of vector, first value is for \code{favoredFFLs} and second for \code{favoredCircles}.}
 
+\item{returned}{Function can return values, ranks or both.}
+
+\item{ties.method}{a character string specifying how ties are treated. See \code{\link[base:rank]{base::rank()}}.}
+
 \item{verbose}{Shows some information during process.}
 
 \item{throwOnError}{If FALSE, in case of stopping error, returns NULL. Otherwise \code{\link[base:stop]{base::stop()}} is called.}
 }
 \value{
-Named 1-column matrix of probabilities (0-1).
+If \code{returned} is "\code{values}", a named 1-column matrix of probabilities (0-1) is returned.
+If \code{returned} is "\code{ranks}", a named 1-column matrix of ranks (highest value->first ranking) is returned.
+If \code{returned} is "\code{both}", a list containing the two matrices is returned.
 }
 \description{
 Infers importance of Regulatory Network nodes (genes),

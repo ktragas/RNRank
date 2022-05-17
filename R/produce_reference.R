@@ -12,7 +12,7 @@
 #' @param biomart Protein-Gene matching table. Normally from BioMart database.
 #' @param org_id STRING organism ID. If specified, it is assumed that protein names
 #' in the interactions table will have the form *<org_id>.<protein>*.
-#' @param thresholdCols Column numbers in protein interactions dataset,
+#' @param thresholdCols Column indices in protein interactions dataset,
 #' to be checked against thresholds
 #' @param thresholds Respective thresholds for thresholdCols.
 #' Only greater values than the threshold are accepted.

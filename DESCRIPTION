@@ -21,6 +21,7 @@ Imports:
     dplyr,
     rprojroot,
     stats,
+    stringr,
     utils,
     withr
 Depends: 
