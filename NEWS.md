@@ -1,3 +1,8 @@
+# RNRank 0.2.5.9000
+
+* Support for functional analyses removed 
+* Minor optimizations
+
 # RNRank 0.2.4.9002
 
 * Favoring of circles added

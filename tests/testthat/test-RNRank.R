@@ -25,8 +25,9 @@ test_that("RNRank works", {
   expect_output({
     OutputPath=file.path(rprojroot::find_root(rprojroot::has_dir("tests")),"Output")
     name=#"gene_exp_out"
-         "GSE63889"
+         #"GSE63889"
          #"GSE182432"
+        "Human_lung"
     title=sprintf("%s - Most important genes", name)
     RNEA_output_file=file.path(OutputPath,paste0(name,"_Network.csv"))
     srcm=as.matrix(read.table(RNEA_output_file,header=T,sep=","))
@@ -40,8 +41,8 @@ test_that("RNRank works", {
              returned="both",verbose = T)
     P=l$values
     print(head(P,10))
-    # barplot(P[1:min(length(P),30),1],las=2,main=title)
-    barplot(P[min(length(P),20):1,1],las=2,main=title,horiz=T,
+    # barplot(P[1:min(nrow(P),30),1],las=2,main=title)
+    barplot(P[min(nrow(P),20):1,1],las=2,main=title,horiz=T,
             cex.names=0.8,width=10,space=0.4)
   })
 })
