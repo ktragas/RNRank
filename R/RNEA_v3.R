@@ -61,6 +61,13 @@ RNEAv3<-function(filename,species,internal_data=T, miRNA_data=F,
   # Μετά από τον έλεγχο παραμέτρων, όλα τα warnings αγνοούνται μέχρι το τέλος της συνάρτησης
   withr::local_options(list(warn = -1))
 
+  # Αν δεν υπάρχει το directory εξόδου, το δημιουργώ
+  if (dir.exists(output_dir)==FALSE)
+    dir.create(output_dir)
+  # Αν προϋπήρχε ή πέτυχε η δημιουργία το προσθέτω στο πρόθεμα
+  if (dir.exists(output_dir)==TRUE)
+    output=file.path(output_dir,output)
+
   if (internal_data && species %in% c("Human","Mouse")) {
     # Αν έχουν ζητηθεί τα δεδομένα που περιέχονται στο πακέτο για άνθρωπο ή ποντίκι
     if (species=="Human")
@@ -122,8 +129,14 @@ RNEAv3<-function(filename,species,internal_data=T, miRNA_data=F,
 	}
 
 	for (line in seq_len(nrow(Input))){ # Στον παλιό κώδικα έλεγε for(line in 2:nrow(Input)) - πρώην header???
-	  if (Input[line,pv_idx]>PV_threshold) next;
-	  if (Input[line,fc_idx]>-FC_threshold && Input[line,fc_idx]<FC_threshold) next;
+	  PV=Input[line,pv_idx]
+	  FC=Input[line,fc_idx]
+	  # sanity checks
+	  if (!is.numeric(PV) || !is.finite(PV)) next;
+	  if (!is.numeric(FC) || !is.finite(FC)) next;
+	  # threshold checks
+	  if (PV>PV_threshold) next;
+	  if (FC>-FC_threshold && FC<FC_threshold) next;
 
 	  # Εδώ έρχονται μόνο DE
 	  gene=as.character(Input[line, g_idx])
@@ -169,6 +182,7 @@ RNEAv3<-function(filename,species,internal_data=T, miRNA_data=F,
         count=count+1
         cat(sprintf("[%d] %s\r",count,stringr::str_pad(z,15,"right")))
       }
+
       # Κάθε εγγραφή περιέχει διαφορετικό πλήθος ρυθμιζόμενων γονιδίων,
       # που καθορίζεται στη στήλη 1 των αρχείων reference
       # και βρίσκονται από την στήλη 3 και πέρα
@@ -179,9 +193,12 @@ RNEAv3<-function(filename,species,internal_data=T, miRNA_data=F,
       deup_len = length(deup)
       dedown_len = length(dedown)
       # Parent - children
-      Network = rbind(Network,
+      if (deup_len > 0 || dedown_len > 0) {
+        Network = rbind(Network,
                   if_else(deup_len>0,cbind(z,deup),NULL),
                   if_else(dedown_len>0,cbind(z,dedown),NULL))
+      }
+
       TF_counts[z, 3] = IsDE[[direction]]
       TF_counts[z, 4] = TF_counts[z, 4] + deup_len + dedown_len
       TF_counts[z, 5] = TF_counts[z, 5] + deup_len
@@ -190,7 +207,7 @@ RNEAv3<-function(filename,species,internal_data=T, miRNA_data=F,
       child_TFs=intersect(TF[z,3:last_index],TF_genes)
       # child_TF_indices=match(child_TFs,TF[z,3:last_index])+2
 
-      #Για κάθε ρυθμιζόμενο γονίδιο που ρυθμίζει κι αυτό κάποια γονίδια (είναι δηλαδή TF)
+      # Για κάθε ρυθμιζόμενο γονίδιο που ρυθμίζει κι αυτό κάποια γονίδια (είναι δηλαδή TF)
       for (gene in child_TFs) {
         inner_last_index=2 + TF[gene, 1]
         deup = intersect(TF[gene, 3:inner_last_index], UP_genes)
@@ -207,6 +224,7 @@ RNEAv3<-function(filename,species,internal_data=T, miRNA_data=F,
             if_else(deup_len>0,cbind(gene,deup),NULL),
             if_else(dedown_len>0,cbind(gene,dedown),NULL))
         }
+
         TF_counts[z, 1] = TF_counts[z, 1] + TF[gene, 1]
         TF_counts[z, 4] = TF_counts[z, 4] + deup_len + dedown_len
         TF_counts[z, 5] = TF_counts[z, 5] + deup_len
@@ -282,25 +300,18 @@ RNEAv3<-function(filename,species,internal_data=T, miRNA_data=F,
 	}
 	Network=unique(Network)
 
-	if (ffl)
-	  outffl=RNFfl(Network, verbose, throwOnError)
-	if (circles)
-	  outcircle=RNCircle(Network,verbose,throwOnError)
-
-	# Αν δεν υπάρχει το directory εξόδου, το δημιουργώ
-	if (dir.exists(output_dir)==FALSE)
-	  dir.create(output_dir)
-	# Αν προϋπήρχε ή πέτυχε η δημιουργία το προσθέτω στο πρόθεμα
-	if (dir.exists(output_dir)==TRUE)
-	  output=file.path(output_dir,output)
-
 	write.csv(Network,file=paste0(output,"_Network.csv"),quote=F,row.names=F);
 	if (ffl) {
-	  write.csv(outffl,file=paste0(output,"_FFLs.csv"),quote = F,row.names = F)
+	  outffl=RNFfl(Network, verbose, throwOnError)
+	  if (nrow(outffl)>0)
+	    write.csv(outffl,file=paste0(output,"_FFLs.csv"),quote = F,row.names = F)
 	}
 	if (circles) {
-	  write.csv(outcircle,file=paste0(output,"_Circles.csv"),quote = F,row.names = F)
-	}
+	  outcircle=RNCircle(Network,verbose,throwOnError)
+	  if (nrow(outffl)>0)
+	    write.csv(outcircle,file=paste0(output,"_Circles.csv"),quote = F,row.names = F)
+  }
+
 	if (rank) {
 	  P=RNRank(Network,...,favoredFFLs = ifelse(favorFFL & ffl,outffl,NULL),
 	           favoredCircles=ifelse(favorCircles & circles,outcircle,NULL),

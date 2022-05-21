@@ -126,7 +126,7 @@ RNFct<-function(network,func=c("ffl","circle"),verbose=F,throwOnError=T)
       msg=sprintf("Found %d %ss consisting of %d (out of %d) different genes",
                   n,title,length(unique(c(fct))),ngenes)
     else
-      msg=sprintf("%ss not found",title)
+      msg=sprintf("No %ss found",title)
     print(msg)
   }
   return(fct)
