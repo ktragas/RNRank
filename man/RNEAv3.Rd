@@ -28,7 +28,7 @@ RNEAv3(
 \item{filename}{Differential expression file (Cuffdiff, 3-column, 1-column)}
 
 \item{species}{Organism. "Human","Mouse" datasets exist in package.
-If any other, the relevant reference file must be provided in \code{reference_dir}.}
+#' If any other, the relevant reference file must be provided in \code{reference_dir}.}
 
 \item{internal_data}{If \code{TRUE} the package's internal datasets are used}
 

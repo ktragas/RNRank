@@ -28,7 +28,7 @@
 #'
 #' @param filename Differential expression file (Cuffdiff, 3-column, 1-column)
 #' @param species Organism. "Human","Mouse" datasets exist in package.
-#' If any other, the relevant reference file must be provided in `reference_dir`.
+#' #' If any other, the relevant reference file must be provided in `reference_dir`.
 #' @param internal_data If `TRUE` the package's internal datasets are used
 #' @param miRNA_data Use miRNA data
 #' @param FC_threshold log2FC threshold
@@ -253,7 +253,8 @@ RNEAv3<-function(filename,species,internal_data=T, miRNA_data=F,
 	}
 
 	DE_rows=which(TF_counts[,3]!=0); # Διαφορικά εκφρασμένα γονίδια
-	if(length(DE_rows)==0){
+	TF_enrichment=(length(DE_rows)>0)
+	if(!TF_enrichment){
 	  print("No TF's targets found deregulated")
 	} else {
 	  # print(TF_counts[which(TF_counts[,3]!=0),]);
@@ -277,18 +278,20 @@ RNEAv3<-function(filename,species,internal_data=T, miRNA_data=F,
 	}
 
 	if (miRNA_data) {
-  	if(length(which(miRNA_counts[,3]!=0))==0){
+	  miRNA_DE_rows=which(miRNA_counts[,3]!=0);
+	  miRNA_enrichment=(length(miRNA_DE_rows)>0)
+  	if(!miRNA_enrichment){
   		print("No miRNA's targets found deregulated")
   	} else {
-  # 		print(miRNA_counts[which(miRNA_counts[,3]!=0),]);
-  		ResultsmiRNA=matrix(nrow=nrow(miRNA_counts[which(miRNA_counts[,3]!=0),]),ncol=3);
-  		rownames(ResultsmiRNA)=rownames(miRNA_counts)[which(miRNA_counts[,3]!=0)];
+  # 		print(miRNA_counts[miRNA_DE_rows,]);
+  		ResultsmiRNA=matrix(nrow=nrow(miRNA_counts[miRNA_DE_rows,]),ncol=3);
+  		rownames(ResultsmiRNA)=rownames(miRNA_counts)[miRNA_DE_rows];
   		colnames(ResultsmiRNA)=c("DE_qvalue","UP_qvalue","DOWN_qvalue");
-  		ResultsmiRNAtemp=matrix(nrow=nrow(miRNA_counts[which(miRNA_counts[,3]!=0),]),ncol=3);
-  		rownames(ResultsmiRNAtemp)=rownames(miRNA_counts)[which(miRNA_counts[,3]!=0)];
+  		ResultsmiRNAtemp=matrix(nrow=nrow(miRNA_counts[miRNA_DE_rows,]),ncol=3);
+  		rownames(ResultsmiRNAtemp)=rownames(miRNA_counts)[miRNA_DE_rows];
   		colnames(ResultsmiRNAtemp)=c("DE_pvalue","UP_pvalue","DOWN_pvalue");
-  		for(i in 1:length(which(miRNA_counts[,3]!=0))){
-  			r=which(miRNA_counts[,3]!=0)[i];
+  		for(i in 1:length(miRNA_DE_rows)){
+  			r=miRNA_DE_rows[i];
   			ResultsmiRNAtemp[i,1]<-stats::phyper(miRNA_counts[r,3],Number_of_DE_genes,(miRNA_counts[r,2]-Number_of_DE_genes), miRNA_counts[r,1],lower.tail=FALSE);
   			ResultsmiRNAtemp[i,2]<-stats::phyper(miRNA_counts[r,4],Number_of_Up_genes,(miRNA_counts[r,2]-Number_of_Up_genes), miRNA_counts[r,1],lower.tail=FALSE);
   			ResultsmiRNAtemp[i,3]<-stats::phyper(miRNA_counts[r,5],Number_of_Down_genes,(miRNA_counts[r,2]-Number_of_Down_genes), miRNA_counts[r,1],lower.tail=FALSE);
@@ -303,12 +306,12 @@ RNEAv3<-function(filename,species,internal_data=T, miRNA_data=F,
 	write.csv(Network,file=paste0(output,"_Network.csv"),quote=F,row.names=F);
 	if (ffl) {
 	  outffl=RNFfl(Network, verbose, throwOnError)
-	  if (nrow(outffl)>0)
+	  if (!is.null(outffl) && nrow(outffl)>0)
 	    write.csv(outffl,file=paste0(output,"_FFLs.csv"),quote = F,row.names = F)
 	}
 	if (circles) {
 	  outcircle=RNCircle(Network,verbose,throwOnError)
-	  if (nrow(outffl)>0)
+	  if (!is.null(outcircle) && nrow(outcircle)>0)
 	    write.csv(outcircle,file=paste0(output,"_Circles.csv"),quote = F,row.names = F)
   }
 
@@ -319,16 +322,20 @@ RNEAv3<-function(filename,species,internal_data=T, miRNA_data=F,
 	  write.csv(P,file=paste0(output,"_Ranks.csv"),quote = F,row.names = T)
 	}
 
-	tempnames=c("Regulator",colnames(ResultsTF));
-	ResultsTF=cbind(rownames(ResultsTF),as.data.frame(ResultsTF));
-	colnames(ResultsTF)=tempnames;
-	write.csv(as.data.frame(ResultsTF),file=paste0(output,"_TF_Enrichment.csv"),row.names=F);
+	if (TF_enrichment) {
+  	tempnames=c("Regulator",colnames(ResultsTF));
+  	ResultsTF=cbind(rownames(ResultsTF),as.data.frame(ResultsTF));
+  	colnames(ResultsTF)=tempnames;
+  	write.csv(as.data.frame(ResultsTF),file=paste0(output,"_TF_Enrichment.csv"),row.names=F);
+	}
 
 	if (miRNA_data) {
-  	tempnames=c("miRNA",colnames(ResultsmiRNA));
-  	ResultsmiRNA=cbind(rownames(ResultsmiRNA),as.data.frame(ResultsmiRNA));
-  	colnames(ResultsmiRNA)=tempnames;
-  	write.csv(as.data.frame(ResultsmiRNA),file=paste0(output,"_miRNA_Enrichment.csv"),row.names=F);
+	  if (miRNA_enrichment) {
+    	tempnames=c("miRNA",colnames(ResultsmiRNA));
+    	ResultsmiRNA=cbind(rownames(ResultsmiRNA),as.data.frame(ResultsmiRNA));
+    	colnames(ResultsmiRNA)=tempnames;
+    	write.csv(as.data.frame(ResultsmiRNA),file=paste0(output,"_miRNA_Enrichment.csv"),row.names=F);
+  	}
   }
 
 	# Return

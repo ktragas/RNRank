@@ -1,3 +1,7 @@
+# RNRank 0.2.6.9000
+
+* Utility functions and supporting data added 
+
 # RNRank 0.2.5.9000
 
 * Support for functional analyses removed 
