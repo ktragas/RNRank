@@ -14,8 +14,6 @@ test_that("RNEAv3 works", {
             "GSE182432"
       #species="Mouse",
       species="Human"
-      #output=paste0(species,"_lung")
-      #file="D:/Users/kt/Google Drive/EAP/DE/Run/lung.tsv"
       print(system.time(
         RNEAv3(
         filename=file,species=species, internal_data=F,

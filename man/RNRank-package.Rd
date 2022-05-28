@@ -6,8 +6,17 @@
 \alias{_PACKAGE}
 \title{RNRank: A package for gene ranking in inferred active regulatory network}
 \description{
-The RNRank package provides six  functions:
-\code{\link[=RNEAv3]{RNEAv3()}}, \code{\link[=RNRank]{RNRank()}}, \code{\link[=RNFfl]{RNFfl()}}, \code{\link[=RNCircle]{RNCircle()}}, \code{\link[=produce_reference]{produce_reference()}} and \code{\link[=produce_reference_from_files]{produce_reference_from_files()}}
+The RNRank package provides eight functions:
+\itemize{
+\item \code{\link[=RNEAv3]{RNEAv3()}},
+\item \code{\link[=RNRank]{RNRank()}},
+\item \code{\link[=RNFfl]{RNFfl()}},
+\item \code{\link[=RNCircle]{RNCircle()}},
+\item \code{\link[=produce_reference]{produce_reference()}},
+\item \code{\link[=produce_reference_from_files]{produce_reference_from_files()}},
+\item \code{\link[=getGeneNames]{getGeneNames()}} and
+\item \code{\link[=getPackageData]{getPackageData()}}
+}
 }
 \author{
 \strong{Maintainer}: Konstantinos Tragkas \email{std507586@ac.eap.gr} (\href{https://orcid.org/0000-0001-6181-8904}{ORCID})

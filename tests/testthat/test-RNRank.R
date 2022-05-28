@@ -26,8 +26,8 @@ test_that("RNRank works", {
     OutputPath=file.path(rprojroot::find_root(rprojroot::has_dir("tests")),"Output")
     name=#"gene_exp_out"
          #"GSE63889"
-         #"GSE182432"
-        "Human_lung"
+         "GSE182432"
+
     title=sprintf("%s - Most important genes", name)
     RNEA_output_file=file.path(OutputPath,paste0(name,"_Network.csv"))
     srcm=as.matrix(read.table(RNEA_output_file,header=T,sep=","))

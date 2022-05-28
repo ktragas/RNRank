@@ -1,3 +1,8 @@
+# RNRank 0.2.6.9001
+
+* Utility function added 
+* Minor fixes
+
 # RNRank 0.2.6.9000
 
 * Utility functions and supporting data added 

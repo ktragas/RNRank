@@ -7,7 +7,7 @@
 getGeneNames(species = c("", "Human", "Mouse"), x)
 }
 \arguments{
-\item{species}{}
+\item{species}{Organism. "Human","Mouse" datasets exist in package.}
 
 \item{x}{The vector of Ensembl IDs to be replaced with the corresponding}
 }

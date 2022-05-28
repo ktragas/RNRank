@@ -4,9 +4,7 @@
 #' internally stored data.
 #'
 #' @param species Organism. "Human","Mouse" datasets exist in package.
-#'
 #' @param x The vector of Ensembl IDs to be replaced with the corresponding
-#' @param species
 #'
 #' @return An equally-sized vector with replaced values, where possible.
 #' @export
