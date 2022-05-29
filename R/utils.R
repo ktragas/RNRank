@@ -16,34 +16,7 @@ common_params<-function() {
   )
 }
 
-# Δημιουργία πλήρους δικτύου από αρχείο reference
-makeNetFromReference<-function(species="Mouse",suffix="_TF_Reference.tsv",reference_dir="?",verbose=T)
-{
-   if (reference_dir=="?") {
-     reference_dir=system.file("extdata","ReferenceFiles",package="RNRank")
-   }
-   TF_ref=file.path(reference_dir,paste0(species,suffix));
-   TF=read.table(TF_ref,sep="\t",fill=T);
-   rownames(TF)=TF[,2];
-   Network=matrix(ncol=2,nrow=0)
-   colnames(Network)=c("Source","Target");
-   a=apply(TF,1,function(x) {
-      last_index=2+as.integer(x[1])
-      return(cbind(x[2],x[3:last_index]))
-   })
-   Network=do.call("rbind", a)
-   rownames(Network)=NULL
-   if (verbose) {
-      ng=length(unique(c(Network)))
-      nr=nrow(Network)
-      if (nr>0)
-        msg=sprintf("Network consists of %d genes and contains %d edges",ng,nr)
-      else
-        msg="Empty network"
-      print(msg)
-   }
-   return(Network)
-}
+
 
 # Προσαρμογή μεταβάσεων σύμφωνα με το δίκτυο
 #

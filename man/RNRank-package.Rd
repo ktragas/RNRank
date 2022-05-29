@@ -6,7 +6,7 @@
 \alias{_PACKAGE}
 \title{RNRank: A package for gene ranking in inferred active regulatory network}
 \description{
-The RNRank package provides eight functions:
+The RNRank package provides nine functions:
 \itemize{
 \item \code{\link[=RNEAv3]{RNEAv3()}},
 \item \code{\link[=RNRank]{RNRank()}},
@@ -14,8 +14,9 @@ The RNRank package provides eight functions:
 \item \code{\link[=RNCircle]{RNCircle()}},
 \item \code{\link[=produce_reference]{produce_reference()}},
 \item \code{\link[=produce_reference_from_files]{produce_reference_from_files()}},
-\item \code{\link[=getGeneNames]{getGeneNames()}} and
-\item \code{\link[=getPackageData]{getPackageData()}}
+\item \code{\link[=getGeneNames]{getGeneNames()}},
+\item \code{\link[=getPackageData]{getPackageData()}} and
+\item \code{\link[=makeNetFromReference]{makeNetFromReference()}}
 }
 }
 \author{

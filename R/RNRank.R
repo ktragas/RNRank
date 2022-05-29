@@ -1,14 +1,15 @@
 #' RNRank: A package for gene ranking in inferred active regulatory network
 #'
-#' The RNRank package provides eight functions:
+#' The RNRank package provides nine functions:
 #' * [RNEAv3()],
 #' * [RNRank()],
 #' * [RNFfl()],
 #' * [RNCircle()],
 #' * [produce_reference()],
 #' * [produce_reference_from_files()],
-#' * [getGeneNames()] and
-#' * [getPackageData()]
+#' * [getGeneNames()],
+#' * [getPackageData()] and
+#' * [makeNetFromReference()]
 #'
 #' @docType package
 #' @keywords internal

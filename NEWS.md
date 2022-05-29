@@ -1,3 +1,7 @@
+# RNRank 0.2.6.9002
+
+* Expanded and exported makeNetFromReference()
+
 # RNRank 0.2.6.9001
 
 * Utility function added 
