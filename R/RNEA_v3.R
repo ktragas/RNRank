@@ -207,6 +207,10 @@ RNEAv3<-function(filename,species,internal_data=T, miRNA_data=F,
       child_TFs=intersect(TF[z,3:last_index],TF_genes)
       # child_TF_indices=match(child_TFs,TF[z,3:last_index])+2
 
+      # Υπάρχει η περίπτωση ρυθμιζόμενα γονίδια που υπάρχουν στο reference
+      # να μη βρίσκονται στο input. Πρέπει να παραλειφθούν.
+      child_TFs=child_TFs[child_TFs %in% Input[,g_idx]]
+
       # Για κάθε ρυθμιζόμενο γονίδιο που ρυθμίζει κι αυτό κάποια γονίδια (είναι δηλαδή TF)
       for (gene in child_TFs) {
         inner_last_index=2 + TF[gene, 1]
