@@ -1,5 +1,3 @@
-
-
 #' @title  Produce a list of Transcription Factors interactions
 #'
 #' @description Produces and saves a file with a list of Transcription Factors interactions,

@@ -54,7 +54,7 @@ RNEAv3<-function(filename,species,internal_data=T, miRNA_data=F,
                  reference_dir="ReferenceFiles",ffl=T,circles=T,rank=T,
                  favorFFL=T, favorCircles=T, ..., verbose=F, throwOnError=T){
 
-  # Κώστας - Ο έλεγχος των παραμέτρων γίνεται άμεσα
+  # Ο έλεγχος των παραμέτρων γίνεται άμεσα
   if (internal_data==TRUE && (species %in% c("Mouse","Human"))==FALSE)
     warning("\"Mouse\" and \"Human\" are the only species supported internally as of now");
 
@@ -117,11 +117,10 @@ RNEAv3<-function(filename,species,internal_data=T, miRNA_data=F,
 	DE_genes=matrix(data=0,nrow=1);
 	UP_genes=matrix(data=0,nrow=1);
 	DOWN_genes=matrix(data=0,nrow=1);
-	# Network=matrix(ncol=2,data=""); # Κώστας - Δημιουργούσε μια κενή γραμμή στα αποτελέσματα
 	Network=matrix(ncol=2,nrow=0);
 	colnames(Network)=c("Source","Target");
 
-	# Κώστας (start)
+	# Καθορισμός σημαντικών στηλών
 	if (ncolInput==14) { g_idx=3; fc_idx=10; pv_idx=12; }
 	else {
 	  g_idx=1;
@@ -155,7 +154,6 @@ RNEAv3<-function(filename,species,internal_data=T, miRNA_data=F,
 	    DOWN_genes[Number_of_Down_genes]=gene;
 	  }
 	}
-	# Κώστας (end)
 
 	DE_genes=unique(DE_genes);
 	UP_genes=unique(UP_genes);

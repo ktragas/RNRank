@@ -218,7 +218,7 @@ RNRank = function(network, damping=0.85, max_iterations=100, threshold=0,
     #   print("Break")
     # }
     I1=H%*%I
-    e=sqrt(sum((I1 - I)^2))  # Ευκλίδεια απόσταση τρέχοντος βήματος από το προηγούμενο
+    e=sqrt(sum((I1 - I)^2))  # Ευκλείδεια απόσταση τρέχοντος βήματος από το προηγούμενο
     I=I1
     if (e<=threshold) break  # Ικανοποιητική σύγκλιση
   }
